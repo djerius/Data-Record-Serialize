@@ -98,6 +98,7 @@ Data::Record::Serialize - Flexible serialization of a record
     # cleanup record before sending
     $s = Data::Record::Serialize->new( encode => 'json',
 	fields => [ qw( obsid chip_id phi theta ) ],
+        format => 1,
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
 	rename_fields => { chip_id => 'CHIP' },
@@ -111,6 +112,7 @@ Data::Record::Serialize - Flexible serialization of a record
 	encode => 'dbi',
 	dsn => [ 'SQLite', [ dbname => $dbname ] ],
 	table => 'stuff',
+        format => 1,
 	fields => [ qw( obsid chip_id phi theta ) ],
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
