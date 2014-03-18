@@ -101,7 +101,7 @@ Data::Record::Serialize - Flexible serialization of a record
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
 	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' }'
+	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
 
@@ -115,7 +115,7 @@ Data::Record::Serialize - Flexible serialization of a record
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
 	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' }'
+	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
 
