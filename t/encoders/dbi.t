@@ -10,7 +10,8 @@ use Data::Record::Serialize;
 use File::Temp;
 use Class::Load qw[ try_load_class ];
 
-use DBI;
+try_load_class( 'DBI' )
+  or plan skip_all => "Need DBI to run the DBI backend tests\n";
 
 try_load_class( 'DBD::SQLite' )
   or plan skip_all => "Need DBD::SQLite to run the DBI backend tests\n";

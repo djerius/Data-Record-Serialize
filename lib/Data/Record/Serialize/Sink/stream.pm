@@ -2,6 +2,8 @@ package Data::Record::Serialize::Sink::stream;
 
 use Moo::Role;
 
+use IO::File;
+
 has output => (
     is      => 'ro',
 );
