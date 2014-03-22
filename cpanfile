@@ -11,6 +11,13 @@ recommends 'YAML::Tiny';
 recommends 'DBD::SQLite';
 requires 'perl',               '5.010001';
 
+on test => sub {
+
+    requires 'Test::More';
+    requires 'Test::Fatal';
+    requires 'File::Temp';
+    requires 'Class::Load';
+};
 
 on develop => sub {
     requires 'Module::Install';
