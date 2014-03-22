@@ -16,12 +16,12 @@ has dsn => (
         for my $el ( @{$arg} ) {
 
             my $ref = ref $el;
-            push( @dsn, $el), next
+            push( @dsn, $el ), next
               unless $ref eq 'ARRAY' || $ref eq 'HASH';
 
             my @arr = $ref eq 'ARRAY' ? @{$el} : %{$el};
 
-            push @dsn, pairmap { join( '=', $a, $b ) }  @arr;
+            push @dsn, pairmap { join( '=', $a, $b ) } @arr;
         }
 
         unshift @dsn, 'dbi' unless $dsn[0] =~ /^dbi/;
@@ -87,6 +87,18 @@ has column_defs => (
 
 );
 
+has batch => (
+    is      => 'ro',
+    default => 100,
+    coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
+);
+
+has _cache => (
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { [] },
+);
+
 before BUILD => sub {
 
     my $self = shift;
@@ -101,14 +113,6 @@ before BUILD => sub {
     $self->_set__need_types( 1 );
 
 };
-
-sub send {
-
-    my $self = shift;
-
-    $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
-}
-
 
 sub _table_exists {
 
@@ -134,7 +138,7 @@ sub setup {
             $self->db_user,
             $self->db_pass,
             {
-                AutoCommit => 1,
+                AutoCommit => !$self->batch,
                 RaiseError => 1,
             } ) ) or die( 'error connection to ', $self->dsn, "\n" );
 
@@ -158,6 +162,42 @@ sub setup {
 
 }
 
+sub _empty_cache {
+
+    my $self = shift;
+
+    eval {
+        $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
+        $self->_dbh->commit;
+    };
+
+    # don't bother rolling back aborted transactions;
+    # individual inserts are independent of each other.
+    croak "Transaction aborted: $@" if $@;
+
+    @{ $self->_cache } = ();
+
+    return;
+}
+
+sub send {
+
+    my $self = shift;
+
+    if ( $self->batch ) {
+
+        push @{ $self->_cache }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
+
+        $self->_empty_cache
+          if @{ $self->_cache } == $self->batch;
+
+    }
+    else {
+        $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
+    }
+
+}
+
 
 after '_trigger_output_fields' => sub {
     $_[0]->clear_column_defs;
@@ -168,6 +208,15 @@ after '_trigger_output_types' => sub {
 };
 
 
+sub cleanup {
+
+    my $self = shift;
+
+    $self->_empty_cache
+      if $self->batch;
+
+    $self->_dbh->disconnect;
+}
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
@@ -194,7 +243,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 =head1 DESCRIPTION
 
 B<Data::Record::Serialize::Encode::dbi> writes a record to a database using
-L<B<DBI>>
+L<B<DBI>>.
 
 It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
 L<B<Data::Record::Serialize::Role::Sink>> roles.
@@ -206,6 +255,14 @@ Field types are recognized and converted to SQL types via the following map:
   S => 'text'
   N => 'real'
   I => 'integer'
+
+
+=head2 Performance
+
+Records are by default written to the database in batches (see the
+C<batch> attribute) to improve performance.  Each batch is performed
+as a single transaction.  If there is an error during the transaction,
+record insertions during the transaction are I<not> rolled back.
 
 =head1 INTERFACE
 
@@ -239,6 +296,13 @@ The standard prefix of C<dbi:> will be added if not present.
 =item db_user
 
 The name of the database user
+
+=item batch
+
+The number of rows to write to the database at once.  This defaults to 100.
+
+If greater than 1, C<batch> rows are cached and then sent out in a
+single transaction.  See L</Performance> for more information.
 
 =item db_pass
 

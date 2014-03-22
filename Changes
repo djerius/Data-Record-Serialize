@@ -1,3 +1,10 @@
+0.02	2014-03-22T16:46:43-0400
+
+  [ENHANCEMENT]
+
+    * DBI writes are now written as batche in a transaction to improve
+      performance
+
 0.01	2014-03-18T15:19:58-0400
 
     * initial release
