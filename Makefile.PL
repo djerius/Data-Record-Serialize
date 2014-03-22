@@ -8,7 +8,7 @@ all_from 'lib/Data/Record/Serialize.pm';
 author   q{Diab Jerius <djerius@cpan.org>};
 license  'gpl3';
 
-perl_version 5.006;
+perl_version 5.010001;
 
 tests_recursive('t');
 
