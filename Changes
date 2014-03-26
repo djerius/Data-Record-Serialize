@@ -1,3 +1,9 @@
+0.03	2014-03-25T21:02:15-0400
+
+  [BUG FIX]
+
+    * DBI drop_table option was broken
+
 0.02	2014-03-22T16:46:43-0400
 
   [ENHANCEMENT]
