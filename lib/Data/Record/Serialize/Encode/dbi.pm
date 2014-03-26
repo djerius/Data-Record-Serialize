@@ -142,12 +142,16 @@ sub setup {
                 RaiseError => 1,
             } ) ) or die( 'error connection to ', $self->dsn, "\n" );
 
-    $self->_dbh->do( 'drop table ', $self->table )
+    $self->_dbh->do( 'drop table ' . $self->table )
       if $self->drop_table && $self->_table_exists;
+
+    $self->_dbh->commit if $self->batch;
 
     $self->_dbh->do(
         sprintf( "create table %s ( %s )", $self->table, $self->column_defs ) )
       if $self->drop_table || ( $self->create_table && !$self->_table_exists );
+
+    $self->_dbh->commit if $self->batch;
 
     my $sql = sprintf(
         "insert into %s (%s) values (%s)",

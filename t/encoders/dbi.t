@@ -137,6 +137,51 @@ subtest 'transaction rows > batch' => sub {
     test_db( $db );
 };
 
+subtest 'drop table' => sub {
+
+    my $db = File::Temp->new;
+    my $s;
+
+    my $dbh;
+    is(
+        exception {
+            $dbh = DBI->connect( "dbi:SQLite:dbname=@{[ $db->filename ]}",
+                '', '', { RaiseError => 1 } );
+        },
+        undef,
+        'open sqlite db file'
+    );
+
+    is(
+        exception {
+            $dbh->do( 'create table test ( foo real )' );
+        },
+        undef,
+        'create table'
+    );
+    $dbh->disconnect;
+
+    is(
+        exception {
+            $s = Data::Record::Serialize->new(
+                encode     => 'dbi',
+                dsn        => [ 'SQLite', { dbname => $db->filename } ],
+                table      => 'test',
+                batch      => $test_data_nrows - 1,
+                drop_table => 1,
+            );
+        },
+        undef,
+        "constructor"
+    );
+
+    $s->send( {%$_} ) foreach @test_data;
+
+    undef $s;
+
+    test_db( $db );
+};
+
 
 
 sub test_db {
