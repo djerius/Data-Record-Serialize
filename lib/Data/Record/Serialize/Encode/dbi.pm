@@ -93,6 +93,8 @@ has batch => (
     coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
 );
 
+has dbitrace => ( is => 'ro', );
+
 has _cache => (
     is       => 'ro',
     init_arg => undef,
@@ -141,6 +143,9 @@ sub setup {
                 AutoCommit => !$self->batch,
                 RaiseError => 1,
             } ) ) or die( 'error connection to ', $self->dsn, "\n" );
+
+    $self->_dbh->trace( $self->dbitrace )
+      if $self->dbitrace;
 
     $self->_dbh->do( 'drop table ' . $self->table )
       if $self->drop_table && $self->_table_exists;
@@ -300,6 +305,10 @@ The standard prefix of C<dbi:> will be added if not present.
 =item db_user
 
 The name of the database user
+
+=item dbitrace
+
+A trace setting passed to  L<B<DBI>>.
 
 =item batch
 
