@@ -102,7 +102,8 @@ Data::Record::Serialize - Flexible serialization of a record
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
 	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' },
+	types => { obsid => 'I', chip_id => 'S',
+                   phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
 
@@ -117,7 +118,8 @@ Data::Record::Serialize - Flexible serialization of a record
 	format_types => { N => '%0.4f' },
 	format_fields => { obsid => '%05d' },
 	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S', phi => 'N', theta => 'N' },
+	types => { obsid => 'I', chip_id => 'S',
+                   phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
 
@@ -326,7 +328,7 @@ order, provided the encoder permits it (see below, however).  For example,
   types => [ c => 'N', a => 'N', b => 'N' ]
 
   # order doesn't matter
-  types => [ c => 'N', a => 'N', b => 'N' }
+  types => { c => 'N', a => 'N', b => 'N' }
 
 If C<fields> is specified, then its order will override that specified
 here.  If no type is specified for elements in C<fields>, they will
@@ -358,7 +360,7 @@ C<types> attribute will be output.  If that is not specified, the
 fields as found in the first data record will be output.
 
 If a field name is specifed in C<fields> but no type is defined in
-C<types>, it defaults to C<S>.
+C<types>, it defaults to what is specified via C<default_type>.
 
 =item C<rename_fields>
 
@@ -505,11 +507,6 @@ L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
 Other modules:
 
 L<B<Data::Serializer>>
-
-
-=head1 VERSION
-
-Version 0.01
 
 =head1 LICENSE AND COPYRIGHT
 
