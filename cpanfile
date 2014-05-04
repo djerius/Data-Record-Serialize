@@ -5,7 +5,7 @@ requires 'Hash::Util';
 requires 'List::Util' => 1.38;
 requires 'Package::Variant';
 requires 'Class::Load';
-requires 'Types::Standard';
+requires 'Types::Standard', 0.042;
 recommends 'JSON::Tiny';
 recommends 'YAML::Tiny';
 recommends 'DBD::SQLite';
