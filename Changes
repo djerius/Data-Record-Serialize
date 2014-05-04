@@ -1,3 +1,8 @@
+0.05_01	2014-05-04T00:18:21-0400
+
+  [BUILD]
+    * specify minimum required version of Types::Standard
+
 0.05	2014-05-02T15:51:19-0400
 
   [OTHER]
