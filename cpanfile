@@ -1,6 +1,6 @@
 #! perl
 
-requires 'Moo';
+requires 'Moo' => 1.004002;
 requires 'Hash::Util';
 requires 'List::Util' => 1.38;
 requires 'Package::Variant';
