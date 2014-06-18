@@ -16,6 +16,14 @@ try_load_class( 'DBI' )
 try_load_class( 'DBD::SQLite' )
   or plan skip_all => "Need DBD::SQLite to run the DBI backend tests\n";
 
+sub tmpfile {
+
+    # *BSD systems need EXLOCK=>0 to prevent lock contention (see docs
+    # for File::Temp)
+    return File::Temp->new( @_, EXLOCK => 0 );
+
+}
+
 
 my @test_data = (
 
@@ -31,7 +39,7 @@ my $test_data_nrows = @test_data;
 
 subtest 'autocommit' => sub {
 
-    my $db = File::Temp->new;
+    my $db = tmpfile();
     my $s;
 
     is(
@@ -59,7 +67,7 @@ subtest 'autocommit' => sub {
 
 subtest 'transaction rows == batch' => sub {
 
-    my $db = File::Temp->new;
+    my $db = tmpfile();
     my $s;
 
     is(
@@ -89,7 +97,7 @@ subtest 'transaction rows == batch' => sub {
 
 subtest 'transaction rows < batch' => sub {
 
-    my $db = File::Temp->new;
+    my $db = tmpfile();
     my $s;
 
     is(
@@ -114,7 +122,7 @@ subtest 'transaction rows < batch' => sub {
 
 subtest 'transaction rows > batch' => sub {
 
-    my $db = File::Temp->new;
+    my $db = tmpfile();
     my $s;
 
     is(
@@ -139,7 +147,7 @@ subtest 'transaction rows > batch' => sub {
 
 subtest 'drop table' => sub {
 
-    my $db = File::Temp->new;
+    my $db = tmpfile();
     my $s;
 
     my $dbh;
