@@ -1,3 +1,10 @@
+0.05_03 2014-06-18T09:58:58-0400
+
+  [TEST FIX]
+
+    * fix breakage on *BSD due to exclusive lock contention on temp
+      SQLite file, (see File::Temp docs on EXLOCK). srezic++
+
 0.05_02	2014-05-05T10:13:23-0400
 
   [BUILD]

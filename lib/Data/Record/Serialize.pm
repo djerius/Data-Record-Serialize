@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.05_02';
+our $VERSION = '0.05_03';
 
 use Package::Variant
   importing => ['Moo'],
