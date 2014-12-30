@@ -5,7 +5,6 @@ use Test::Fatal;
 
 use lib 't/lib';
 
-use Data::Dumper;
 use Data::Record::Serialize;
 
 use lib 't/lib';
@@ -62,9 +61,9 @@ subtest "format types" => sub {
 			   c => 'S',
 			 },
                 format_types => {
-                    N => 'number',
-                    I => 'integer',
-                    S => 'string',
+                    N => 'number: %s',
+                    I => 'integer: %s',
+                    S => 'string: %s',
                 },
             );
         },
@@ -81,9 +80,9 @@ subtest "format types" => sub {
     is_deeply(
         $VAR1,
         {
-            a => 'number',
-            b => 'integer',
-	    c => 'string',
+            a => 'number: 1',
+            b => 'integer: 2',
+	    c => 'string: 3',
         },
         'properly formatted'
     );
@@ -100,9 +99,9 @@ subtest "format types w/o specifying them" => sub {
                 encode        => 'ddump',
                 output        => \$buf,
                 format_types => {
-                    N => 'number',
-                    I => 'integer',
-                    S => 'string',
+                    N => 'number: %s',
+                    I => 'integer: %s',
+                    S => 'string: %s',
                 },
             );
         },
@@ -119,9 +118,9 @@ subtest "format types w/o specifying them" => sub {
     is_deeply(
         $VAR1,
         {
-            a => 'number',
-            b => 'integer',
-	    c => 'string',
+            a => 'number: 1.1',
+            b => 'integer: 2',
+	    c => 'string: nyuck',
         },
         'properly formatted'
     );
@@ -142,9 +141,9 @@ subtest "format fields overrides types" => sub {
 			   c => 'S',
 			 },
                 format_types => {
-                    N => 'number',
-                    I => 'integer',
-                    S => 'string',
+                    N => 'number: %s',
+                    I => 'integer: %s',
+                    S => 'string: %s',
                 },
                 format_fields => {
                     a => 'aAa: %s',
@@ -167,7 +166,7 @@ subtest "format fields overrides types" => sub {
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-	    c => 'string',
+	    c => 'string: 3',
         },
         'properly formatted'
     );
