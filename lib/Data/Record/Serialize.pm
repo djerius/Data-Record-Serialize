@@ -487,20 +487,11 @@ The input field names for those fields deemed to be numeric.
 
 =head1 BUGS AND LIMITATIONS
 
-=for author to fill in:
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
-
 No bugs have been reported.
 
 Please report any bugs or feature requests to
 C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize>.
+L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
 
 =head1 SEE ALSO
 
