@@ -30,6 +30,13 @@ around 'setup' => sub {
     $self->_set_types_from_record( $data )
       if $self->_need_types && !$self->types;
 
+    # convert metadata types if requested
+    if ( $self->metadata && $self->_map_types ) {
+
+	$_->{type} = $self->_map_types->{ $_->{type}} for map { $_->[1] }@{ $self->metadata }
+
+    }
+
     $orig->( $self );
 
     $self->_set__run_setup( 0 );

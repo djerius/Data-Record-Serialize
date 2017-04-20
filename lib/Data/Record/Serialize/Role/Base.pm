@@ -2,15 +2,20 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-use Types::Standard qw[ ArrayRef HashRef Enum Str Bool ];
+use Data::Record::Serialize::Types
+  qw[ ArrayRef DataType HashRef Dict Str Bool ];
+use Type::Params qw[ validate ];
 
+use Scalar::Util qw[ reftype ];
+use List::Util qw[ pairs ];
 use POSIX ();
 use Carp;
+use Try::Tiny;
 
 has types => (
     is      => 'rwp',
     trigger => 1,
-    isa     => HashRef [ Enum [qw( N I S )] ] | ArrayRef,
+    isa     => HashRef [DataType] | ArrayRef,
 );
 
 sub _trigger_types {
@@ -22,7 +27,7 @@ sub _trigger_types {
 
 has default_type => (
     is      => 'ro',
-    isa     => Enum[ qw( N I S ) ],
+    isa     => DataType,
     default => 'S',
 );
 
@@ -234,6 +239,11 @@ has _format => (
     init_arg => undef,
 );
 
+has metadata => (
+    is  => 'rwp',
+    isa => ArrayRef | HashRef,
+);
+
 sub BUILD {
 
     my $self = shift;
@@ -275,37 +285,105 @@ sub BUILD {
 
         }
 
-	# default to string if not specified
-	$self->types->{$_} = $self->default_type
-	  for grep { !defined $self->types->{$_} } @{ $self->fields };
+        # default to string if not specified
+        $self->types->{$_} = $self->default_type
+          for grep { !defined $self->types->{$_} } @{ $self->fields };
     }
 
+
+    $self->_normalize_metadata if $self->metadata;
+
     return;
+}
+
+sub _normalize_metadata {
+
+    my $self = shift;
+
+    my $type = reftype $self->metadata;
+
+    my @data
+      = 'ARRAY'eq $type  ? @{ $self->metadata }
+      : 'HASH' eq $type ? %{ $self->metadata }
+      :                    croak( "internal error\n" );
+
+    croak( "odd number of elements in metadata list\n" )
+      if @data % 2;
+
+    # if the data values look like a hash { type => $type, value => $value }
+    # we're done.  otherwise, determine the type
+
+    my @metadata;
+    for my $pair ( pairs @data ) {
+
+        my ( $key, $value ) = @$pair;
+
+        my $type = ref $value;
+        if ( 'HASH' eq ref $value ) {
+
+            try {
+
+                validate( [ $value ], Dict [ type => DataType, value => Str ] );
+
+            }
+            catch {
+                croak( "metadata value for $key didn't match prototype: $_\n" );
+            };
+
+            # copy so we don't break user's things
+            $value = {%$value};
+        }
+        else {
+
+            $value = {
+                value => $value,
+                type  => $self->_get_type_from_value( $value ),
+            };
+
+        }
+
+        push @metadata, [ $key, $value ];
+
+    }
+
+    $self->_set_metadata( \@metadata );
+
+}
+
+
+sub _get_type_from_value {
+
+    my $self = shift;
+
+    # my ( $value ) = @_;
+
+    my $def = Scalar::Util::looks_like_number( $_[0] ) ? 'N' : 'S';
+
+    $def = 'I'
+      if $self->_use_integer
+      && $def eq 'N'
+      && POSIX::floor( $_[0] ) == POSIX::ceil( $_[0] );
+
+    return $def;
+
+}
+
+sub _get_types_from_record {
+
+    my ( $self, $fields, $data ) = @_;
+
+    return { map { $_ => $self->_get_type_from_value( $data->{$_} ) }
+          @$fields };
+
 }
 
 sub _set_types_from_record {
 
     my ( $self, $data ) = @_;
 
-    my %types;
-
-    for my $field ( @{ $self->fields } ) {
-
-        my $value = $data->{$field};
-        my $def = Scalar::Util::looks_like_number( $value ) ? 'N' : 'S';
-
-        $def = 'I'
-          if $self->_use_integer
-          && $def eq 'N'
-          && POSIX::floor( $value ) == POSIX::ceil( $value );
-
-        $types{$field} = $def;
-    }
-
-    $self->_set_types( \%types );
+    $self->_set_types( $self->_get_types_from_record( $self->fields, $data ) );
 
 }
-
 
 sub DEMOLISH {
 

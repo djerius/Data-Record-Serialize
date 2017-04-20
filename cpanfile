@@ -10,6 +10,8 @@ recommends 'JSON::Tiny';
 recommends 'YAML::Tiny';
 recommends 'DBD::SQLite';
 requires 'perl',               '5.010001';
+requires 'Try::Tiny';
+requires 'Scalar::Util';
 
 on test => sub {
 

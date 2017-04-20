@@ -17,6 +17,17 @@ sub setup {
 
     my $self = shift;
 
+    if ( $self->metadata ) {
+
+	for my $pair ( @{ $self->metadata } ) {
+
+	    my ( $key, $value ) = @$pair;
+
+	    $self->say( join ' ', '#:', $key , '=', $value->{value} );
+	}
+
+    }
+
     $self->say( join( "\t", @{ $self->output_fields } ) );
     $self->say( join( "\t", @{ $self->output_types }{ @{ $self->output_fields } } ) );
 
