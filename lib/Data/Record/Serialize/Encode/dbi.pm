@@ -142,7 +142,7 @@ sub setup {
             {
                 AutoCommit => !$self->batch,
                 RaiseError => 1,
-            } ) ) or die( 'error connection to ', $self->dsn, "\n" );
+            } ) ) or croak( 'error connection to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
@@ -152,9 +152,16 @@ sub setup {
 
     $self->_dbh->commit if $self->batch;
 
-    $self->_dbh->do(
-        sprintf( "create table %s ( %s )", $self->table, $self->column_defs ) )
-      if $self->drop_table || ( $self->create_table && !$self->_table_exists );
+    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) ) {
+
+        my $sql = sprintf( "create table %s ( %s )", $self->table, $self->column_defs );
+        eval {
+            $self->_dbh->do( $sql );
+        };
+
+        croak( "error in table creation: $@:\n$sql\n" )
+          if $@;
+    }
 
     $self->_dbh->commit if $self->batch;
 
