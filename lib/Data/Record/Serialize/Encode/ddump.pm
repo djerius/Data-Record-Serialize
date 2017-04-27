@@ -19,9 +19,11 @@ before BUILD => sub {
 
 };
 
-=for pod_coverage
+=begin pod_coverage
 
-=method encode
+=head3 encode
+
+=end pod_coverage
 
 =cut
 
@@ -55,10 +57,4 @@ It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
 There are no additional attributes which may be passed to
 L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
 

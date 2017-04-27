@@ -14,9 +14,11 @@ use Package::Variant
 
 use namespace::clean;
 
-=for pod_coverage
+=begin pod_coverage
 
-=sub make_variant
+=head3 make_variant
+
+=end pod_coverage
 
 =cut
 
@@ -471,12 +473,6 @@ The input field names for those fields deemed to be numeric.
    );
 
 
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
 
 =head1 SEE ALSO
 

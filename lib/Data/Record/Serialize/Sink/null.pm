@@ -8,11 +8,13 @@ use namespace::clean;
 
 our $VERSION = '0.08';
 
-=for pod_coverage
+=begin pod_coverage
 
-=method print
+=head3 print
 
-=method say
+=head3 say
+
+=end pod_coverage
 
 =cut
 
@@ -39,10 +41,3 @@ __END__
 B<Data::Record::Serialize::Sink::stream> sends data to the bitbucket.
 
 It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
-

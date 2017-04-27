@@ -142,9 +142,11 @@ sub _table_exists {
 
 }
 
-=for pod_coverage
+=begin pod_coverage
 
-=method setup
+=head3  setup
+
+=end pod_coverage
 
 =cut
 
@@ -245,9 +247,11 @@ sub _empty_cache {
     return;
 }
 
-=for pod_coverage
+=begin pod_coverage
 
-=method send
+=head3 send
+
+=end pod_coverage
 
 =cut
 
@@ -279,9 +283,11 @@ after '_trigger_output_types' => sub {
 };
 
 
-=for pod_coverage
+=begin pod_coverage
 
-=method cleanup
+=head3 cleanup
+
+=end pod_coverage
 
 =cut
 
@@ -403,10 +409,3 @@ The output name(s) of the field(s) which should be the primary key(s).
 If not specified, no primary keys are defined.
 
 =back
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
-

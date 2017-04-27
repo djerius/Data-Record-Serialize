@@ -9,9 +9,11 @@ our $VERSION = '0.08';
 use namespace::clean;
 
 
-=for pod_coverage
+=begin pod_coverage
 
-=method send
+=head3 send
+
+=end pod_coverage
 
 =cut
 
@@ -44,10 +46,3 @@ L<B<Data::Record::Serialize::Role::Sink>> roles.
 
 There are no additional attributes which may be passed to
 L<B<Data::Record::Serialize::new>|Data::Record::Serialize/new>.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
-
