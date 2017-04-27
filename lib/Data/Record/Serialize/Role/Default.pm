@@ -14,8 +14,6 @@ sub send {
 
     my $self = shift;
 
-    $self->encode( @_ );
-
     $self->_needs_eol
       ? $self->say( $self->encode( @_ ) )
       : $self->print( $self->encode( @_ ) );
