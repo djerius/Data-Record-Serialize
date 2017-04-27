@@ -1,50 +1,24 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of Data::Record::Serialize
-#
-# Data::Record::Serialize is free software: you can redistribute it
-# and/or modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package Data::Record::Serialize;
+
+# ABSTRACT: Flexible serialization of a record
 
 use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.07_01';
+our $VERSION = '0.08';
 
 use Package::Variant
   importing => ['Moo'],
   subs      => [qw( with has )];
 
-sub new {
+use namespace::clean;
 
-    my $class = shift;
-    my $attr = 'HASH' eq ref $_[0] ? shift : {@_};
+=for pod_coverage
 
-    my %class_attr = (
-        encode => $attr->{encode},
-        sink   => $attr->{sink},
-    );
+=sub make_variant
 
-    $class = Package::Variant->build_variant_of( __PACKAGE__, %class_attr );
-
-    return $class->new( $attr );
-}
+=cut
 
 sub make_variant {
     my ( $class, $target, %attr ) = @_;
@@ -78,14 +52,27 @@ sub make_variant {
 }
 
 
+sub new {
+
+    my $class = shift;
+    my $attr = 'HASH' eq ref $_[0] ? shift : {@_};
+
+    my %class_attr = (
+        encode => $attr->{encode},
+        sink   => $attr->{sink},
+    );
+
+    $class = Package::Variant->build_variant_of( __PACKAGE__, %class_attr );
+
+    return $class->new( $attr );
+}
+
 1;
 
+
+# COPYRIGHT
+
 __END__
-
-=head1 NAME
-
-Data::Record::Serialize - Flexible serialization of a record
-
 
 =head1 SYNOPSIS
 
@@ -487,8 +474,6 @@ The input field names for those fields deemed to be numeric.
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
 Please report any bugs or feature requests to
 C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
 L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
@@ -499,25 +484,6 @@ Other modules:
 
 L<B<Data::Serializer>>
 
-=head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
-
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-=head1 AUTHOR
-
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
 
 

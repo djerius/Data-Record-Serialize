@@ -9,12 +9,7 @@ use Data::Record::Serialize;
 
 use lib 't/lib';
 
-use Data::Record::Serialize::Utils qw[ load_json ];
-
-my $class = eval { load_json }
-  or plan skip_all => 'Some sort of JSON module is required for this test';
-
-my $decode_json = load_json . "::decode_json";
+use JSON::MaybeXS qw[ decode_json ];
 
 my ( $s, $buf );
 
@@ -34,7 +29,7 @@ $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 
 my $VAR1;
 
-is( exception { $VAR1 = &$decode_json( $buf ) },
+is( exception { $VAR1 = decode_json( $buf ) },
     undef,
     'deserialize record' );
 

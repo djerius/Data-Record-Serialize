@@ -2,10 +2,14 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
+our $VERSION = '0.08';
+
 use Types::Standard qw[ ArrayRef HashRef Enum Str Bool ];
 
 use POSIX ();
 use Carp;
+
+use namespace::clean;
 
 has types => (
     is      => 'rwp',
@@ -275,9 +279,9 @@ sub BUILD {
 
         }
 
-	# default to string if not specified
-	$self->types->{$_} = $self->default_type
-	  for grep { !defined $self->types->{$_} } @{ $self->fields };
+        # default to string if not specified
+        $self->types->{$_} = $self->default_type
+          for grep { !defined $self->types->{$_} } @{ $self->fields };
     }
 
     return;
@@ -315,4 +319,11 @@ sub DEMOLISH {
 }
 
 1;
+
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
 

@@ -1,0 +1,350 @@
+# NAME
+
+Data::Record::Serialize - Flexible serialization of a record
+
+# VERSION
+
+version 0.08
+
+# SYNOPSIS
+
+    use Data::Record::Serialize;
+
+    # simple output to json
+    $s = Data::Record::Serialize->new( encode => 'json', \%attr );
+    $s->send( \%record );
+
+    # cleanup record before sending
+    $s = Data::Record::Serialize->new( encode => 'json',
+        fields => [ qw( obsid chip_id phi theta ) ],
+        format => 1,
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
+                   phi => 'N', theta => 'N' },
+    );
+    $s->send( \%record );
+
+
+    # send to an SQLite database
+    $s = Data::Record::Serialize->new(
+        encode => 'dbi',
+        dsn => [ 'SQLite', [ dbname => $dbname ] ],
+        table => 'stuff',
+        format => 1,
+        fields => [ qw( obsid chip_id phi theta ) ],
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
+                   phi => 'N', theta => 'N' },
+    );
+    $s->send( \%record );
+
+# DESCRIPTION
+
+**Data::Record::Serialize** encodes data records and sends them
+somewhere. This module is primarily useful for output of sets of
+uniformly structured data records.  It provides a uniform, thin,
+interface to various serializers and output sinks.  Its _raison
+d'etre_ is its ability to manipulate the records prior to encoding
+and output.
+
+- A record is a collection of fields, i.e. keys and _scalar_
+values.
+- All records are assumed to have the same structure.
+- Fields may have simple types which may be determined automatically.
+Some encoders use this information during encoding.
+- Fields may be renamed upon output
+- A subset of the fields may be selected for output.
+- Fields may be formatted via `sprintf` prior to output
+
+## Encoders
+
+The available encoders and their respective documentation are:
+
+- `dbi` - [**Data::Record::Serialize::Encode::dbi**](https://metacpan.org/pod/Data::Record::Serialize::Encode::dbi)
+
+    Write to a database via **DBI**. This is a combined
+    encoder and sink.
+
+- `ddump` - [**Data::Record::Serialize::Encode::ddump**](https://metacpan.org/pod/Data::Record::Serialize::Encode::ddump)
+
+    encode via [**Data::Dumper**](https://metacpan.org/pod/Data::Dumper)
+
+- `json` - [**Data::Record::Serialize::Encode::json**](https://metacpan.org/pod/Data::Record::Serialize::Encode::json)
+- `null` - send the data to the bit bucket.  This is a combined
+encoder and sink.
+- `rdb`  - [**Data::Record::Serialize::Encode::rdb**](https://metacpan.org/pod/Data::Record::Serialize::Encode::rdb)
+- `yaml` - [**Data::Record::Serialize::Encode::yaml**](https://metacpan.org/pod/Data::Record::Serialize::Encode::yaml)
+
+## Sinks
+
+Sinks are where encoded data are sent.
+
+The available sinks and their documentation are:
+
+- `stream` - [**Data::Record::Serialize::Sink::stream**](https://metacpan.org/pod/Data::Record::Serialize::Sink::stream)
+- `null` - send the encoded data to the bit bucket.
+
+## Types
+
+Some output encoders care about the type of a
+field. **Data::Record::Serialize** recognizes three types:
+
+- `N` - Numeric
+- `I` - Integral
+- `S` - String
+
+Not all encoders support a separate integral type; in those cases
+integer fields are treated as general numeric fields.
+
+## Output field and type determination
+
+The selection of output fields and determination of their types
+depends upon the `fields`, `types`, and `default_type` attributes.
+
+- `fields` specified, `types` _not_ specified
+
+    The fields in `fields` are output. Types are derived from the values
+    in the first record.
+
+- `fields` _not_ specified, `types` specified
+
+    The fields by `types` are output and are given the specified types.
+
+- `fields` specified, `types` specified
+
+    The fields specified by the `fields` array are output with the types
+    specified by `types`.  For fields not specified in `types`, the
+    `default_type` attribute value is used.
+
+- `fields` _not_ specified, `types` _not_ specified
+
+    The first record determines the fields and types (by examination).
+
+# SUBROUTINES
+
+## make\_variant
+
+# INTERFACE
+
+## **new**
+
+    $s = Data::Record::Serialize->new( <attributes> );
+
+Construct a new object. _attributes_ may either be a hashref or a
+list of key-value pairs.
+
+The available attributes are:
+
+- `encode`
+
+    _Required_. The encoding format.  Specific encoders may provide
+    additional, or require specific, attributes. See ["Encoders"](#encoders)
+    for more information.
+
+- `sink`
+
+    Where the encoded data will be sent.  Specific sinks may provide
+    additional, or require specific attributes. See ["Sinks"](#sinks) for more
+    information.
+
+    The default output sink is `stream`, unless the encoder is also a
+    sink.
+
+    It is an error to specify a sink if the encoder already acts as one.
+
+- `default_type`=_type_
+
+    If the `types` attribute was specified, this type is assigned to
+    fields given in the `fields` attributes which were not specified via
+    the `types` attribute.
+
+- `types`
+
+    A hash or array mapping input field names to types (`N`, `I`,
+    `S`).  If an array, the fields will be output in the specified
+    order, provided the encoder permits it (see below, however).  For example,
+
+        # use order if possible
+        types => [ c => 'N', a => 'N', b => 'N' ]
+
+        # order doesn't matter
+        types => { c => 'N', a => 'N', b => 'N' }
+
+    If `fields` is specified, then its order will override that specified
+    here.  If no type is specified for elements in `fields`, they will
+    default to having the type specified by the `default_type` attribute.
+    For example,
+
+        types => [ c => 'N', a => 'N' ],
+        fields => [ qw( a b c ) ],
+        default_type => 'I',
+
+    will result in fields being output in the order
+
+        a b c
+
+    with types
+
+        a => 'N',
+        b => 'I',
+        c => 'N',
+
+- `fields`
+
+    An array containing the input names of the fields to be output. The
+    fields will be output in the specified order, provided the encoder
+    permits it.
+
+    If this attribute is not specified, the fields specified by the
+    `types` attribute will be output.  If that is not specified, the
+    fields as found in the first data record will be output.
+
+    If a field name is specifed in `fields` but no type is defined in
+    `types`, it defaults to what is specified via `default_type`.
+
+- `rename_fields`
+
+    A hash mapping input to output field names.  By default the input
+    field names are used unaltered.
+
+- `format_fields`
+
+    A hash mapping the input field names to a `sprintf` style
+    format. This will be applied prior to encoding the record, but only if
+    the `format` attribute is also set.  Formats specified here override
+    those specified in `format_types`.
+
+- `format_types`
+
+    A hash mapping a field type (`N`, `I`, `S`) to a `sprintf` style
+    format.  This will be applied prior to encoding the record, but only
+    if the `format` attribute is also set.  Formats specified here may be
+    overriden for specific fields using the `format_fields` attribute.
+
+- `format`
+
+    If true, format the output fields using the formats specified in the
+    `format_fields` and/or `format_types` options.  The default is false.
+
+## **send**
+
+    $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+**WARNING**: the passed hash is modified.  If you need the original
+contents, pass in a copy.
+
+## **output\_fields**
+
+    $array_ref = $s->fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+## **output\_types**
+
+    $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+## **numeric\_fields**
+
+    $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+# EXAMPLES
+
+## Generate a JSON stream to the standard output stream
+
+    $s = Data::Record::Serialize->new( encode => 'json' );
+
+## Only output select fields
+
+    $s = Data::Record::Serialize->new(
+      encode => 'json',
+      fields => [ qw( obsid chip_id phi theta ) ],
+     );
+
+## Format numeric fields
+
+    $s = Data::Record::Serialize->new(
+      encode => 'json',
+      fields => [ qw( obsid chip_id phi theta ) ],
+      format => 1,
+      format_types => { N => '%0.4f' },
+     );
+
+## Override formats for specific fields
+
+    $s = Data::Record::Serialize->new(
+      encode => 'json',
+      fields => [ qw( obsid chip_id phi theta ) ],
+      format_types => { N => '%0.4f' },
+      format_fields => { obsid => '%05d' },
+     );
+
+## Rename fields
+
+    $s = Data::Record::Serialize->new(
+      encode => 'json',
+      fields => [ qw( obsid chip_id phi theta ) ],
+      format_types => { N => '%0.4f' },
+      format_fields => { obsid => '%05d' },
+      rename_fields => { chip_id => 'CHIP' },
+     );
+
+## Specify field types
+
+    $s = Data::Record::Serialize->new(
+      encode => 'json',
+      fields => [ qw( obsid chip_id phi theta ) ],
+      format_types => { N => '%0.4f' },
+      format_fields => { obsid => '%05d' },
+      rename_fields => { chip_id => 'CHIP' },
+      types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
+     );
+
+## Switch to an SQLite database in `$dbname`
+
+    $s = Data::Record::Serialize->new(
+      encode => 'dbi',
+      dsn => [ 'SQLite', [ dbname => $dbname ] ],
+      table => 'stuff',
+      fields => [ qw( obsid chip_id phi theta ) ],
+      format_types => { N => '%0.4f' },
+      format_fields => { obsid => '%05d' },
+      rename_fields => { chip_id => 'CHIP' },
+      types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
+     );
+
+# BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+`bug-data-record-serialize@rt.cpan.org`, or through the web interface at
+[https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize](https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize).
+
+# SEE ALSO
+
+Other modules:
+
+[**Data::Serializer**](https://metacpan.org/pod/Data::Serializer)
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

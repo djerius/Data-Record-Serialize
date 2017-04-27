@@ -40,7 +40,7 @@ subtest "format fields" => sub {
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-	    c => 'nyuck nyuck',
+            c => 'nyuck nyuck',
         },
         'properly formatted'
     );
@@ -56,10 +56,10 @@ subtest "format types" => sub {
             $s = Data::Record::Serialize->new(
                 encode        => 'ddump',
                 output        => \$buf,
-	        types => { a => 'N',
-			   b => 'I',
-			   c => 'S',
-			 },
+                types => { a => 'N',
+                           b => 'I',
+                           c => 'S',
+                         },
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
@@ -82,7 +82,7 @@ subtest "format types" => sub {
         {
             a => 'number: 1',
             b => 'integer: 2',
-	    c => 'string: 3',
+            c => 'string: 3',
         },
         'properly formatted'
     );
@@ -120,7 +120,7 @@ subtest "format types w/o specifying them" => sub {
         {
             a => 'number: 1.1',
             b => 'integer: 2',
-	    c => 'string: nyuck',
+            c => 'string: nyuck',
         },
         'properly formatted'
     );
@@ -136,10 +136,10 @@ subtest "format fields overrides types" => sub {
             $s = Data::Record::Serialize->new(
                 encode        => 'ddump',
                 output        => \$buf,
-	        types => { a => 'N',
-			   b => 'I',
-			   c => 'S',
-			 },
+                types => { a => 'N',
+                           b => 'I',
+                           c => 'S',
+                         },
                 format_types => {
                     N => 'number: %s',
                     I => 'integer: %s',
@@ -166,7 +166,7 @@ subtest "format fields overrides types" => sub {
         {
             a => 'aAa: 1',
             b => 'bBb: 2',
-	    c => 'string: 3',
+            c => 'string: 3',
         },
         'properly formatted'
     );

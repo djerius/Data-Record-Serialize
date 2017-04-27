@@ -9,12 +9,7 @@ use Data::Record::Serialize;
 
 use lib 't/lib';
 
-use Data::Record::Serialize::Utils qw[ load_yaml ];
-
-my $class = eval { load_yaml }
-  or plan skip_all => 'Some sort of YAML module is required for this test';
-
-my $Load = load_yaml . "::Load";
+use YAML::Any qw[ Load ];
 
 my ( $s, $buf );
 
@@ -34,7 +29,7 @@ $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 
 my $VAR1;
 
-is( exception { $VAR1 = &$Load( $buf ) },
+is( exception { $VAR1 = Load( $buf ) },
     undef,
     'deserialize record' );
 

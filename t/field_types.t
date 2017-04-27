@@ -80,7 +80,7 @@ subtest "allow type fields to differ from fields" => sub {
         $s->types,
         {
             a => 'N',
-	    b => 'S',
+            b => 'S',
         },
         'retain type for non-existent field',
     );

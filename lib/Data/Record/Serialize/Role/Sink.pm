@@ -1,41 +1,25 @@
 package Data::Record::Serialize::Role::Sink;
 
+# ABSTRACT: Sink Role
+
 use Moo::Role;
 
+use namespace::clean;
+
+our $VERSION = '0.08';
 
 1;
 
 __END__
-
-=head1 NAME
-
-Data::Record::Serialize::Role::Sink - Sink Role
 
 =head1 DESCRIPTION
 
 If a role consumes this, it signals that it provides sink
 capabilities.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 BUGS AND LIMITATIONS
 
-Copyright (c) 2014 The Smithsonian Astrophysical Observatory
-
-B<Data::Record::Serialize> is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-=head1 AUTHOR
-
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
-
-
+Please report any bugs or feature requests to
+C<bug-data-record-serialize@rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize>.
 
