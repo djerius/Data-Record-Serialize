@@ -6,6 +6,11 @@ use Moo::Role;
 
 our $VERSION = '0.08';
 
+use Data::Record::Serialize::Types -types;
+
+use SQL::Translator;
+use SQL::Translator::Schema;
+
 use List::Util qw[ pairmap ];
 
 use DBI;
@@ -54,7 +59,9 @@ has create_table => (
 
 has primary => (
     is      => 'ro',
-    default => '',
+    isa     => ArrayOfStr,
+    coerce  => 1,
+    default => sub { [] },
 );
 
 has db_user => ( is => 'ro', default => '' );
@@ -147,36 +154,66 @@ sub setup {
 
     return if $self->_dbh;
 
+    my @dsn = DBI->parse_dsn( $self->dsn )
+      or croak( "unable to parse DSN: ", $self->dsn );
+    my $dbi_driver = $dsn[1];
+
+    my %attr       = (
+        AutoCommit => !$self->batch,
+        RaiseError => 1,
+    );
+
+    $attr{sqlite_allow_multiple_statements} = 1
+      if $dbi_driver eq 'SQLite';
+
     $self->_set__dbh(
-        DBI->connect(
-            $self->dsn,
-            $self->db_user,
-            $self->db_pass,
-            {
-                AutoCommit => !$self->batch,
-                RaiseError => 1,
-            } ) ) or croak( 'error connection to ', $self->dsn, "\n" );
+                     DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr )
+                    )
+      or croak( 'error connection to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
 
-    $self->_dbh->do( 'drop table ' . $self->table )
-      if $self->drop_table && $self->_table_exists;
+    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) )
+    {
+        my $tr = SQL::Translator->new(
+            from => sub {
+                my $schema = $_[0]->schema;
+                my $table = $schema->add_table( name => $self->table )
+                  or croak $schema->error;
 
-    $self->_dbh->commit if $self->batch;
+                for my $field_name ( @{ $self->output_fields } ) {
 
-    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) ) {
+                    $table->add_field(
+                        name      => $field_name,
+                        data_type => $self->output_types->{$field_name}
+                    ) or croak $table->error;
+                }
 
-        my $sql = sprintf( "create table %s ( %s )", $self->table, $self->column_defs );
-        eval {
-            $self->_dbh->do( $sql );
-        };
+                if ( @{ $self->primary } ) {
+                    $table->primary_key( @{ $self->primary } )
+                      or croak $table->error;
+                }
+
+                1;
+            },
+            to             => $dbi_driver,                              # driver
+            producer_args  => { no_transaction => 1 },
+            add_drop_table => $self->drop_table && $self->_table_exists,
+        );
+
+
+        my $sql = $tr->translate
+          or croak $tr->error;
+
+        # print STDERR $sql;
+        eval { $self->_dbh->do( $sql ); };
 
         croak( "error in table creation: $@:\n$sql\n" )
           if $@;
-    }
 
-    $self->_dbh->commit if $self->batch;
+        $self->_dbh->commit if $self->batch;
+    }
 
     my $sql = sprintf(
         "insert into %s (%s) values (%s)",
@@ -188,7 +225,6 @@ sub setup {
     $self->_set__sth( $self->_dbh->prepare( $sql ) );
 
     return;
-
 }
 
 sub _empty_cache {
@@ -361,9 +397,9 @@ If true, the table is dropped and a new one is created.
 
 If true, a table will be created if it does not exist.
 
-=item C<primary>
+=item C<primary> I<name> | I<array of names>
 
-The output name of the field which should be the primary key.
+The output name(s) of the field(s) which should be the primary key(s).
 If not specified, no primary keys are defined.
 
 =back
