@@ -8,6 +8,8 @@ use namespace::clean;
 
 our $VERSION = '0.08';
 
+requires 'encode';
+
 1;
 
 __END__

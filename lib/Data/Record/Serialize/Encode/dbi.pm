@@ -301,6 +301,26 @@ sub cleanup {
     $self->_dbh->disconnect;
 }
 
+# these are required by the Sink/Encode interfaces but should never be
+# called in the ordinary run of things.
+
+=begin pod_coverage
+
+=head3 say
+
+=head3 print
+
+=head3 encode
+
+=end pod_coverage
+
+=cut
+
+
+sub say { croak }
+sub print { croak }
+sub encode { croak }
+
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
 

@@ -11,13 +11,22 @@ use namespace::clean;
 
 =begin pod_coverage
 
+=head3 encode
+
 =head3 send
+
+=head3 print
+
+=head3 say
 
 =end pod_coverage
 
 =cut
 
+sub encode { }
 sub send {  }
+sub print { }
+sub say { }
 
 with 'Data::Record::Serialize::Role::Encode';
 with 'Data::Record::Serialize::Role::Sink';

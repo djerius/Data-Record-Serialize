@@ -8,6 +8,9 @@ use namespace::clean;
 
 our $VERSION = '0.08';
 
+requires 'print';
+requires 'say';
+
 1;
 
 __END__
