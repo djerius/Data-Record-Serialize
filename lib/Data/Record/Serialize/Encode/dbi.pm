@@ -18,6 +18,24 @@ use Carp;
 
 use namespace::clean;
 
+=attr C<dsn>
+
+I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
+may either be a string or an arrayref containing strings or arrayrefs,
+which should contain key-value pairs.  Elements in the sub-arrays are
+joined with C<=>, elements in the top array are joined with C<:>.  For
+example,
+
+  [ 'SQLite', { dbname => $db } ]
+
+is transformed to
+
+  SQLite:dbname=$db
+
+The standard prefix of C<dbi:> will be added if not present.
+
+=cut
+
 has dsn => (
     is       => 'ro',
     required => 1,
@@ -42,20 +60,48 @@ has dsn => (
     },
 );
 
+=attr C<table>
+
+I<Required> The name of the table in the database which will contain the records.
+It will be created if it does not exist.
+
+=cut
+
 has table => (
     is       => 'ro',
     required => 1,
 );
+
+=attr C<drop_table>
+
+If true, the table is dropped and a new one is created.
+
+=cut
 
 has drop_table => (
     is      => 'ro',
     default => 0,
 );
 
+
+=attr C<create_table>
+
+If true, a table will be created if it does not exist.
+
+=cut
+
 has create_table => (
     is      => 'ro',
     default => 1,
 );
+
+=attr C<primary>
+
+A single output column name or an array of output column names which
+should be the primary key(s).  If not specified, no primary keys are
+defined.
+
+=cut
 
 has primary => (
     is      => 'ro',
@@ -64,8 +110,29 @@ has primary => (
     default => sub { [] },
 );
 
-has db_user => ( is => 'ro', default => '' );
-has db_pass => ( is => 'ro', default => '' );
+=attr C<db_user>
+
+The name of the database user
+
+=cut
+
+has db_user => (
+    is      => 'ro',
+    isa     => Str,
+    default => '',
+);
+
+=attr C<db_pass>
+
+The database password
+
+=cut
+
+has db_pass => (
+    is      => 'ro',
+    isa     => Str,
+    default => '',
+);
 
 
 has _sth => (
@@ -101,11 +168,26 @@ has column_defs => (
 
 );
 
+=attr C<batch>
+
+The number of rows to write to the database at once.  This defaults to 100.
+
+If greater than 1, C<batch> rows are cached and then sent out in a
+single transaction.  See L</Performance> for more information.
+
+=cut
+
 has batch => (
     is      => 'ro',
     default => 100,
     coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
 );
+
+=attr C<dbitrace>
+
+A trace setting passed to  L<B<DBI>>.
+
+=cut
 
 has dbitrace => ( is => 'ro', );
 
@@ -358,6 +440,9 @@ L<B<DBI>>.
 It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
 L<B<Data::Record::Serialize::Role::Sink>> roles.
 
+B<You cannot construct this directly; you must use
+L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
+
 =head2 Types
 
 Field types are recognized and converted to SQL types via the following map:
@@ -374,70 +459,7 @@ C<batch> attribute) to improve performance.  Each batch is performed
 as a single transaction.  If there is an error during the transaction,
 record insertions during the transaction are I<not> rolled back.
 
-=head1 INTERFACE
-
-You cannot construct this directly; you must use
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
-
-=head2 Attributes
+=head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
 defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
-
-=over
-
-=item C<dsn>
-
-I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
-may either be a string or an arrayref containing strings or arrayrefs,
-which should contain key-value pairs.  Elements in the sub-arrays are
-joined with C<=>, elements in the top array are joined with C<:>.  For
-example,
-
-  [ 'SQLite', { dbname => $db } ]
-
-is transformed to
-
-  SQLite:dbname=$db
-
-The standard prefix of C<dbi:> will be added if not present.
-
-
-=item db_user
-
-The name of the database user
-
-=item dbitrace
-
-A trace setting passed to  L<B<DBI>>.
-
-=item batch
-
-The number of rows to write to the database at once.  This defaults to 100.
-
-If greater than 1, C<batch> rows are cached and then sent out in a
-single transaction.  See L</Performance> for more information.
-
-=item db_pass
-
-The database password
-
-=item C<table>
-
-I<Required> The name of the table in the database which will contain the records.
-It will be created if it does not exist.
-
-=item C<drop_table>
-
-If true, the table is dropped and a new one is created.
-
-=item C<create_table>
-
-If true, a table will be created if it does not exist.
-
-=item C<primary> I<name> | I<array of names>
-
-The output name(s) of the field(s) which should be the primary key(s).
-If not specified, no primary keys are defined.
-
-=back
