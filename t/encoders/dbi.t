@@ -8,12 +8,11 @@ use lib 't/lib';
 use Data::Record::Serialize;
 
 use File::Temp;
-use Class::Load qw[ try_load_class ];
 
-try_load_class( 'DBI' )
+eval 'use DBI; 1'
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
 
-try_load_class( 'DBD::SQLite' )
+eval 'use DBD::SQLite; 1'
   or plan skip_all => "Need DBD::SQLite to run the DBI backend tests\n";
 
 sub tmpfile {
