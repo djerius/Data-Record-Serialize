@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+ [ BUG FIX ]
+    * dbi encoder: handle table names which include schema, e.g.
+        schema.table
+
 0.08      2017-04-28 10:05:23-04:00 America/New_York (TRIAL RELEASE)
 
  [ ENHANCEMENTS ]

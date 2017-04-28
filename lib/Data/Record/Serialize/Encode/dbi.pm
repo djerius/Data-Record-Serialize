@@ -74,6 +74,25 @@ has table => (
     required => 1,
 );
 
+=attr C<schema>
+
+The schema to which the table belongs.  Optional.
+
+=begin pod_coverage
+
+=head3 has_schema
+
+=end pod_coverage
+
+=cut
+
+
+has schema => (
+    is        => 'ro',
+    predicate => 1,
+    isa       => Str,
+);
+
 =attr C<drop_table>
 
 If true, the table is dropped and a new one is created.
@@ -221,12 +240,16 @@ sub _table_exists {
 
     my $self = shift;
 
-    # ignore catalogue and schema out of sheer ignorance, and the fact
-    # that I'm not alone in that ignorance.
-
     return
-      defined $self->_dbh->table_info( '%', '%', $self->table, 'TABLE' )->fetch;
+      defined $self->_dbh->table_info( '%', $self->schema, $self->table,
+        'TABLE' )->fetch;
+}
 
+sub _fq_table_name {
+
+    my $self = shift;
+
+    join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
 =begin pod_coverage
@@ -280,7 +303,7 @@ sub setup {
         my $tr = SQL::Translator->new(
             from => sub {
                 my $schema = $_[0]->schema;
-                my $table = $schema->add_table( name => $self->table )
+                my $table = $schema->add_table( name => $self->_fq_table_name )
                   or croak $schema->error;
 
                 for my $field_name ( @{ $self->output_fields } ) {
@@ -318,7 +341,7 @@ sub setup {
 
     my $sql = sprintf(
         "insert into %s (%s) values (%s)",
-        $self->table,
+        $self->_fq_table_name,
         join( ',', @{ $self->output_fields } ),
         join( ',', ( '?' ) x @{ $self->output_fields } ),
     );
