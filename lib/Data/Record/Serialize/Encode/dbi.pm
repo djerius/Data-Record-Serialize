@@ -183,7 +183,7 @@ has column_defs => (
               join( ' ',
                 $field,
                 $self->output_types->{$field},
-                ( 'primary key' ) x !!( $self->primary eq $field ) );
+                ( 'primary key' )x!!( $self->primary eq $field ) );
         }
 
         return join ', ', @column_defs;
@@ -280,9 +280,9 @@ sub setup {
       or croak( "unable to parse DSN: ", $self->dsn );
     my $dbi_driver = $dsn[1];
 
-    my $producer =  $producer{$dbi_driver} || $dbi_driver;
+    my $producer = $producer{$dbi_driver} || $dbi_driver;
 
-    my %attr       = (
+    my %attr = (
         AutoCommit => !$self->batch,
         RaiseError => 1,
     );
@@ -291,8 +291,7 @@ sub setup {
       if $dbi_driver eq 'SQLite';
 
     $self->_set__dbh(
-                     DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr )
-                    )
+        DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
       or croak( 'error connection to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
@@ -439,8 +438,8 @@ sub cleanup {
 =cut
 
 
-sub say { croak }
-sub print { croak }
+sub say    { croak }
+sub print  { croak }
 sub encode { croak }
 
 with 'Data::Record::Serialize::Role::Sink';
