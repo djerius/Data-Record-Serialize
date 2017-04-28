@@ -4,7 +4,7 @@ use Moo::Role;
 
 our $VERSION = '0.10';
 
-use Types::Standard qw[ ArrayRef HashRef Enum Str Bool ];
+use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef ];
 
 use POSIX ();
 use Carp;
@@ -174,6 +174,14 @@ has format_types => (
 has rename_fields => (
     is      => 'ro',
     isa     => HashRef [Str],
+    coerce  => sub {
+        return $_[0] unless is_HashRef( $_[0] );
+
+        # remove renames which do nothing
+        my %rename = %{ $_[0] };
+        delete @rename{ grep { $rename{$_} eq $_ } keys %rename };
+        return \%rename;
+    },
     default => sub { {} },
     trigger => 1,
 );
