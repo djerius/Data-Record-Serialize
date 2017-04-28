@@ -31,7 +31,6 @@ on 'develop' => sub {
   requires "Dist::Zilla::Plugin::BumpVersionAfterRelease" => "0";
   requires "Dist::Zilla::Plugin::CPANFile" => "0";
   requires "Dist::Zilla::Plugin::CheckMetaResources" => "0";
-  requires "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0";
   requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
   requires "Dist::Zilla::Plugin::EnsureChangesHasContent" => "0";
   requires "Dist::Zilla::Plugin::EnsurePrereqsInstalled" => "0";
