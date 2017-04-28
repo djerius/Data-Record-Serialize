@@ -10,6 +10,7 @@ use Data::Record::Serialize::Types -types;
 
 use SQL::Translator;
 use SQL::Translator::Schema;
+use Types::Standard -types;
 
 use List::Util qw[ pairmap ];
 
@@ -69,6 +70,7 @@ It will be created if it does not exist.
 
 has table => (
     is       => 'ro',
+    isa      => Str,
     required => 1,
 );
 
@@ -80,6 +82,7 @@ If true, the table is dropped and a new one is created.
 
 has drop_table => (
     is      => 'ro',
+    isa     => Bool,
     default => 0,
 );
 
@@ -92,6 +95,7 @@ If true, a table will be created if it does not exist.
 
 has create_table => (
     is      => 'ro',
+    isa     => Bool,
     default => 1,
 );
 
@@ -179,6 +183,7 @@ single transaction.  See L</Performance> for more information.
 
 has batch => (
     is      => 'ro',
+    isa     => Int,
     default => 100,
     coerce  => sub { $_[0] > 1 ? $_[0] : 0 },
 );
