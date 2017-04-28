@@ -242,8 +242,6 @@ sub BUILD {
 
     my $self = shift;
 
-    my %args;
-
     # if we're asked to format based on types, make sure
     # we create them if needed.
     $self->_set__need_types( 1 )
