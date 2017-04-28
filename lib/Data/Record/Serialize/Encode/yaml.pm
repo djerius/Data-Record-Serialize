@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::yaml;
 
 use Moo::Role;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use YAML::Any qw[ Dump ];
 
