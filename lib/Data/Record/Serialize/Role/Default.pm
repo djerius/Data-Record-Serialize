@@ -92,5 +92,17 @@ before 'send' => sub {
 # case it doesn't exist there.
 sub cleanup { }
 
-
 1;
+
+__END__
+
+=begin pod_coverage
+
+=head3 cleanup
+
+=head3 send
+
+=head3 setup
+
+=end pod_coverage
+

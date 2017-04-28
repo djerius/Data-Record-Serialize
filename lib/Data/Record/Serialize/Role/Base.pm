@@ -319,3 +319,27 @@ sub DEMOLISH {
 }
 
 1;
+
+__END__
+
+=begin pod_coverage
+
+=head3 BUILD
+
+=head3 DEMOLISH
+
+=head3 default_type
+
+=head3 fields
+
+=head3 format
+
+=head3 format_fields
+
+=head3 format_types
+
+=head3 rename_fields
+
+=head3 types
+
+=end pod_coverage
