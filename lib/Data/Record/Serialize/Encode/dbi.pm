@@ -150,6 +150,16 @@ sub _table_exists {
 
 =cut
 
+my %producer = (
+    DB2       => 'DB2',
+    MySQL     => 'mysql',
+    Oracle    => 'Oracle',
+    Pg        => 'PostgreSQL',
+    SQLServer => 'SQLServer',
+    SQLite    => 'SQLite',
+    Sybase    => 'Sybase',
+);
+
 sub setup {
 
     my $self = shift;
@@ -159,6 +169,8 @@ sub setup {
     my @dsn = DBI->parse_dsn( $self->dsn )
       or croak( "unable to parse DSN: ", $self->dsn );
     my $dbi_driver = $dsn[1];
+
+    my $producer =  $producer{$dbi_driver} || $dbi_driver;
 
     my %attr       = (
         AutoCommit => !$self->batch,
@@ -199,7 +211,7 @@ sub setup {
 
                 1;
             },
-            to             => $dbi_driver,                              # driver
+            to             => $producer,
             producer_args  => { no_transaction => 1 },
             add_drop_table => $self->drop_table && $self->_table_exists,
         );
