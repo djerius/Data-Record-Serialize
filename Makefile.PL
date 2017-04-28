@@ -16,16 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "gpl",
   "NAME" => "Data::Record::Serialize",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Class::Load" => 0,
-    "Data::Dumper" => 0,
     "JSON::MaybeXS" => 0,
     "Moo::Role" => 0,
     "Package::Variant" => 0,
+    "SQL::Translator" => 0,
     "Types::Standard" => 0,
     "YAML::Any" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -45,9 +42,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Class::Load" => 0,
-  "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -55,12 +49,12 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "Moo::Role" => 0,
   "Package::Variant" => 0,
+  "SQL::Translator" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,
   "Types::Standard" => 0,
   "YAML::Any" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "namespace::clean" => 0
 );
 
 

@@ -1,13 +1,10 @@
-requires "Carp" => "0";
-requires "Class::Load" => "0";
-requires "Data::Dumper" => "0";
 requires "JSON::MaybeXS" => "0";
 requires "Moo::Role" => "0";
 requires "Package::Variant" => "0";
+requires "SQL::Translator" => "0";
 requires "Types::Standard" => "0";
 requires "YAML::Any" => "0";
-requires "strict" => "0";
-requires "warnings" => "0";
+requires "namespace::clean" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -70,6 +67,8 @@ on 'develop' => sub {
   requires "Dist::Zilla::PluginBundle::Basic" => "0";
   requires "Dist::Zilla::PluginBundle::Filter" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Weaver::Section::BugsAndLimitations" => "0";
+  requires "Pod::Weaver::Section::SeeAlso" => "0";
   requires "Software::License::GPL_3" => "0";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::CPAN::Meta::JSON" => "0.16";

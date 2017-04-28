@@ -124,10 +124,6 @@ depends upon the `fields`, `types`, and `default_type` attributes.
 
     The first record determines the fields and types (by examination).
 
-# SUBROUTINES
-
-## make\_variant
-
 # INTERFACE
 
 ## **new**
@@ -327,15 +323,15 @@ The input field names for those fields deemed to be numeric.
 
 # BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to
-`bug-data-record-serialize@rt.cpan.org`, or through the web interface at
-[https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize](https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize).
+You can make new bug reports, and view existing ones, through the
+web interface at [https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize](https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize).
 
 # SEE ALSO
 
-Other modules:
+Please see those modules/websites for more information related to this module.
 
-[**Data::Serializer**](https://metacpan.org/pod/Data::Serializer)
+- [Other modules:](https://metacpan.org/pod/Other&#x20;modules:)
+- [**Data::Serializer**](https://metacpan.org/pod/Data::Serializer)
 
 # AUTHOR
 
