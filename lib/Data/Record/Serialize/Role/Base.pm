@@ -229,8 +229,9 @@ has _format => (
                 }
 
             }
-            return \%format;
 
+            return \%format
+              if keys %format;
         }
 
         return;
