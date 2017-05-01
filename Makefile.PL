@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-Record-Serialize",
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Data::Record::Serialize",
   "PREREQ_PM" => {
     "JSON::MaybeXS" => 0,
+    "List::Util" => "1.29",
     "Moo::Role" => 0,
     "Package::Variant" => 0,
     "SQL::Translator" => 0,
@@ -30,13 +32,14 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
-    "Test::Fatal" => 0,
+    "Test2::Bundle::Extended" => 0,
+    "Test2::Bundle::More" => 0,
     "Test::More" => 0,
     "YAML::Any" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.11",
   "test" => {
-    "TESTS" => "t/*.t t/encoders/*.t"
+    "TESTS" => "t/*.t t/bugs/*.t t/encoders/*.t"
   }
 );
 
@@ -47,10 +50,12 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "List::Util" => "1.29",
   "Moo::Role" => 0,
   "Package::Variant" => 0,
   "SQL::Translator" => 0,
-  "Test::Fatal" => 0,
+  "Test2::Bundle::Extended" => 0,
+  "Test2::Bundle::More" => 0,
   "Test::More" => 0,
   "Types::Standard" => 0,
   "YAML::Any" => 0,

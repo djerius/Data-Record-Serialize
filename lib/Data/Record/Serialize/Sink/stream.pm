@@ -5,7 +5,7 @@ package Data::Record::Serialize::Sink::stream;
 
 use Moo::Role;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use IO::File;
 

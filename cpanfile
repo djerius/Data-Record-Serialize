@@ -1,10 +1,12 @@
 requires "JSON::MaybeXS" => "0";
+requires "List::Util" => "1.29";
 requires "Moo::Role" => "0";
 requires "Package::Variant" => "0";
 requires "SQL::Translator" => "0";
 requires "Types::Standard" => "0";
 requires "YAML::Any" => "0";
 requires "namespace::clean" => "0";
+requires "perl" => "5.01000";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -12,13 +14,15 @@ on 'test' => sub {
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "JSON::MaybeXS" => "0";
-  requires "Test::Fatal" => "0";
+  requires "Test2::Bundle::Extended" => "0";
+  requires "Test2::Bundle::More" => "0";
   requires "Test::More" => "0";
   requires "YAML::Any" => "0";
 };
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "2.120900";
+  recommends "DBD::SQLite" => "1.31";
 };
 
 on 'configure' => sub {
