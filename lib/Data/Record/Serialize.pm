@@ -2,6 +2,8 @@ package Data::Record::Serialize;
 
 # ABSTRACT: Flexible serialization of a record
 
+use 5.010000;
+
 use strict;
 use warnings;
 use Carp;
