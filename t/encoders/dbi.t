@@ -1,13 +1,10 @@
 #!perl
 
-use Test::More;
-use Test::Fatal;
+use Test2::Bundle::Extended;
 
 use lib 't/lib';
 
 use Data::Record::Serialize;
-
-use File::Temp;
 
 eval 'use DBI; 1'
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
@@ -16,6 +13,8 @@ eval 'use DBD::SQLite; 1'
   or plan skip_all => "Need DBD::SQLite to run the DBI backend tests\n";
 
 sub tmpfile {
+
+    require File::Temp;
 
     # *BSD systems need EXLOCK=>0 to prevent lock contention (see docs
     # for File::Temp)
@@ -41,8 +40,8 @@ subtest 'autocommit' => sub {
     my $db = tmpfile();
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'dbi',
                 dsn    => [ 'SQLite', { dbname => $db->filename } ],
@@ -50,9 +49,8 @@ subtest 'autocommit' => sub {
                 batch  => 1,
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( {%$_} ) foreach @test_data;
 
@@ -69,8 +67,8 @@ subtest 'transaction rows == batch' => sub {
     my $db = tmpfile();
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'dbi',
                 dsn    => [ 'SQLite', { dbname => $db->filename } ],
@@ -78,9 +76,8 @@ subtest 'transaction rows == batch' => sub {
                 batch  => $test_data_nrows,
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( {%$_} ) foreach @test_data;
 
@@ -99,8 +96,8 @@ subtest 'transaction rows < batch' => sub {
     my $db = tmpfile();
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'dbi',
                 dsn    => [ 'SQLite', { dbname => $db->filename } ],
@@ -108,9 +105,8 @@ subtest 'transaction rows < batch' => sub {
                 batch  => $test_data_nrows + 1,
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( {%$_} ) foreach @test_data;
 
@@ -124,8 +120,8 @@ subtest 'transaction rows > batch' => sub {
     my $db = tmpfile();
     my $s;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode => 'dbi',
                 dsn    => [ 'SQLite', { dbname => $db->filename } ],
@@ -133,9 +129,8 @@ subtest 'transaction rows > batch' => sub {
                 batch  => $test_data_nrows - 1,
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( {%$_} ) foreach @test_data;
 
@@ -150,26 +145,24 @@ subtest 'drop table' => sub {
     my $s;
 
     my $dbh;
-    is(
-        exception {
+    ok(
+        lives {
             $dbh = DBI->connect( "dbi:SQLite:dbname=@{[ $db->filename ]}",
                 '', '', { RaiseError => 1 } );
         },
-        undef,
         'open sqlite db file'
-    );
+    ) or diag $@;
 
-    is(
-        exception {
+    ok(
+        lives {
             $dbh->do( 'create table test ( foo real )' );
         },
-        undef,
         'create table'
-    );
+    ) or diag $@;
     $dbh->disconnect;
 
-    is(
-        exception {
+    ok(
+        lives {
             $s = Data::Record::Serialize->new(
                 encode     => 'dbi',
                 dsn        => [ 'SQLite', { dbname => $db->filename } ],
@@ -178,9 +171,8 @@ subtest 'drop table' => sub {
                 drop_table => 1,
             );
         },
-        undef,
         "constructor"
-    );
+    ) or diag $@;
 
     $s->send( {%$_} ) foreach @test_data;
 
@@ -193,7 +185,7 @@ subtest 'drop table' => sub {
 
 sub test_db {
 
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $ctx = context;
 
     my ( $db, $nrows ) = @_;
 
@@ -202,31 +194,31 @@ sub test_db {
     my $dbh;
     my @rows;
 
-    is(
-        exception {
+    ok(
+        lives {
             $dbh = DBI->connect( "dbi:SQLite:dbname=@{[ $db->filename ]}",
                 '', '', { RaiseError => 1 } );
         },
-        undef,
         'open created sqlite db file'
-    );
+    ) or diag $@;
 
     my $sth;
-    is(
-        exception {
+    my $rows;
+    ok(
+        lives {
             $rows = $dbh->selectall_arrayref( 'select * from test',
                 { Slice => {} } );
         },
-        undef,
         'select rows from file',
-    );
+    ) or diag $@;
 
     is( scalar @$rows, $test_data_nrows, 'correct number of rows' );
 
-    is_deeply( $rows->[$_], $test_data[$_],
+    is( $rows->[$_], $test_data[$_],
         "row[$_]: stored data eq passed data" )
       foreach 0 .. $#test_data;
 
+    $ctx->release;
 }
 
 done_testing;
