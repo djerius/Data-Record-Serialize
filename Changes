@@ -1,9 +1,18 @@
 {{$NEXT}}
 
+0.10      2017-04-28 16:55:38-04:00 America/New_York (TRIAL RELEASE)
+
  [ BUG FIX ]
 
    * dbi encoder: renaming a field to itself caused the field to be
      deleted
+
+ [ BUILD FIX ]
+
+   * require Perl >= 5.10 (for // operator)
+   * require List::Util >= 1.29 ( for pairmap )
+   * switch to Test2
+
 
 0.09      2017-04-28 16:55:38-04:00 America/New_York (TRIAL RELEASE)
 
