@@ -88,10 +88,6 @@ before 'send' => sub {
 };
 
 
-# this is overridden by the composing module, but must exist here in
-# case it doesn't exist there.
-sub cleanup { }
-
 1;
 
 __END__

@@ -320,7 +320,7 @@ sub _set_types_from_record {
 
 sub DEMOLISH {
 
-    $_[0]->cleanup;
+    $_[0]->close;
 
     return;
 }

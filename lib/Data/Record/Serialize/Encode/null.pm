@@ -19,6 +19,8 @@ use namespace::clean;
 
 =head3 say
 
+=head3 close
+
 =end pod_coverage
 
 =cut
@@ -27,6 +29,7 @@ sub encode { }
 sub send {  }
 sub print { }
 sub say { }
+sub close { }
 
 with 'Data::Record::Serialize::Role::Encode';
 with 'Data::Record::Serialize::Role::Sink';

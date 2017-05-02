@@ -388,6 +388,18 @@ Encode and send the record to the associated sink.
 B<WARNING>: the passed hash is modified.  If you need the original
 contents, pass in a copy.
 
+
+=head2 B<close>
+
+  $s->close;
+
+Flush any data written to the sink and close it.  While this will be
+performed automatically when the object is destroyed, if the object is
+not destroyed prior to global destruction at the end of the program,
+it is quite possible that it will not be possible to perform this
+cleanly.  In other words, make sure that sinks are closed prior to
+global destruction.
+
 =head2 B<output_fields>
 
   $array_ref = $s->fields;

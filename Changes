@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+ [ENHANCEMENT]
+
+   * new close() method, causes output to sink to be flushed and
+     the sink to be closed.
+
 0.10      2017-04-28 16:55:38-04:00 America/New_York (TRIAL RELEASE)
 
  [ BUG FIX ]

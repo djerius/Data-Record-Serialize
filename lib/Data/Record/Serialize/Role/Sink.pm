@@ -10,6 +10,7 @@ our $VERSION = '0.11';
 
 requires 'print';
 requires 'say';
+requires 'close';
 
 1;
 

@@ -37,14 +37,15 @@ has fh => (
 
 =head3 say
 
+=head3 close
+
 =end pod_coverage
 
 =cut
 
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
-
-
+sub close { shift->fh->close }
 
 with 'Data::Record::Serialize::Role::Sink';
 

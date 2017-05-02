@@ -406,13 +406,13 @@ after '_trigger_output_types' => sub {
 
 =begin pod_coverage
 
-=head3 cleanup
+=head3 close
 
 =end pod_coverage
 
 =cut
 
-sub cleanup {
+sub close {
 
     my $self = shift;
 

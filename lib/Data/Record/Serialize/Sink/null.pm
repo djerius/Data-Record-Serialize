@@ -14,12 +14,15 @@ our $VERSION = '0.11';
 
 =head3 say
 
+=head3 close
+
 =end pod_coverage
 
 =cut
 
-sub print {  }
-sub say   {  }
+sub print { }
+sub say   { }
+sub close { }
 
 
 with 'Data::Record::Serialize::Role::Sink';
