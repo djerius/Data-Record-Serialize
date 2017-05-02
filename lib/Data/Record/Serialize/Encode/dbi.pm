@@ -354,16 +354,19 @@ sub _empty_cache {
 
     my $self = shift;
 
-    eval {
-        $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
-        $self->_dbh->commit;
-    };
+    if ( @{ $self->_cache } ) {
 
-    # don't bother rolling back aborted transactions;
-    # individual inserts are independent of each other.
-    croak "Transaction aborted: $@" if $@;
+        eval {
+            $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
+            $self->_dbh->commit;
+        };
 
-    @{ $self->_cache } = ();
+        # don't bother rolling back aborted transactions;
+        # individual inserts are independent of each other.
+        croak "Transaction aborted: $@" if $@;
+
+        @{ $self->_cache } = ();
+    }
 
     return;
 }
@@ -419,7 +422,8 @@ sub close {
     $self->_empty_cache
       if $self->batch;
 
-    $self->_dbh->disconnect;
+    $self->_dbh->disconnect
+      if defined $self->_dbh;
 }
 
 # these are required by the Sink/Encode interfaces but should never be
