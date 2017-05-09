@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Moo::Role" => 0,
     "Package::Variant" => 0,
     "SQL::Translator" => 0,
-    "Types::Standard" => 0,
+    "Types::Standard" => "1.000005",
     "YAML::Any" => 0,
     "namespace::clean" => 0
   },
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "Test2::Bundle::Extended" => 0,
   "Test2::Bundle::More" => 0,
   "Test::More" => 0,
-  "Types::Standard" => 0,
+  "Types::Standard" => "1.000005",
   "YAML::Any" => 0,
   "namespace::clean" => 0
 );
