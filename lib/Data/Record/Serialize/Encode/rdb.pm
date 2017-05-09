@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 before BUILD => sub {
 

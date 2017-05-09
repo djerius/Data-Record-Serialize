@@ -2,7 +2,7 @@ package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Hash::Util qw[ hv_store ];
 
