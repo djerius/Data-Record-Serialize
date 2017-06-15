@@ -2,7 +2,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef ];
 
