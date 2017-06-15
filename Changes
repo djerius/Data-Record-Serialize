@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+0.12      2017-06-15 15:43:52-04:00 America/New_York
+
+  [BUILD]
+    * require a recent version of Moo::Role to ensure that testers
+      use one with which this code is compatible.
+
+
 0.11      2017-05-09 10:41:54-04:00 America/New_York (TRIAL RELEASE)
 
  [ENHANCEMENT]

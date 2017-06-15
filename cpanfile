@@ -1,6 +1,6 @@
 requires "JSON::MaybeXS" => "0";
 requires "List::Util" => "1.29";
-requires "Moo::Role" => "0";
+requires "Moo::Role" => "2.003";
 requires "Package::Variant" => "0";
 requires "SQL::Translator" => "0";
 requires "Types::Standard" => "1.000005";
@@ -16,6 +16,7 @@ on 'test' => sub {
   requires "JSON::MaybeXS" => "0";
   requires "Test2::Bundle::Extended" => "0";
   requires "Test2::Bundle::More" => "0";
+  requires "Test2::Tools::AfterSubtest" => "0";
   requires "Test::More" => "0";
   requires "YAML::Any" => "0";
 };
