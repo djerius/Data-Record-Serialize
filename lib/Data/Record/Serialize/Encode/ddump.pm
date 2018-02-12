@@ -28,7 +28,12 @@ before BUILD => sub {
 =cut
 
 
-sub encode { shift; goto &Data::Dumper::Dumper; }
+sub encode {
+    shift;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Trailingcomma = 1;
+    Data::Dumper::Dumper( @_ ) . ",\n";
+}
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -48,7 +53,9 @@ __END__
 =head1 DESCRIPTION
 
 B<Data::Record::Serialize::Encode::ddump> encodes a record using
-L<B<Data::Dumper>>.
+L<B<Data::Dumper>>.  The resultant encoding may be decoded via
+
+  @data = eval $buf;
 
 It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
