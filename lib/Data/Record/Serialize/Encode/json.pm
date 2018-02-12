@@ -50,6 +50,13 @@ B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
 as a number.
 
+The output consists of I<concatenated> JSON objects, and is mostly easily
+read by an incremental decoder, e.g.
+
+  use JSON::MaybeXS;
+
+  @data = JSON->new->incr_parse( $json );
+
 It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
 
