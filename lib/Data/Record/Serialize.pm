@@ -350,7 +350,7 @@ If this attribute is not specified, the fields specified by the
 C<types> attribute will be output.  If that is not specified, the
 fields as found in the first data record will be output.
 
-If a field name is specifed in C<fields> but no type is defined in
+If a field name is specified in C<fields> but no type is defined in
 C<types>, it defaults to what is specified via C<default_type>.
 
 =item C<rename_fields>
@@ -370,7 +370,7 @@ those specified in C<format_types>.
 A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
 format.  This will be applied prior to encoding the record, but only
 if the C<format> attribute is also set.  Formats specified here may be
-overriden for specific fields using the C<format_fields> attribute.
+overridden for specific fields using the C<format_fields> attribute.
 
 =item C<format>
 

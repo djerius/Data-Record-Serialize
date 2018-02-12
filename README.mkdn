@@ -199,7 +199,7 @@ The available attributes are:
     `types` attribute will be output.  If that is not specified, the
     fields as found in the first data record will be output.
 
-    If a field name is specifed in `fields` but no type is defined in
+    If a field name is specified in `fields` but no type is defined in
     `types`, it defaults to what is specified via `default_type`.
 
 - `rename_fields`
@@ -219,7 +219,7 @@ The available attributes are:
     A hash mapping a field type (`N`, `I`, `S`) to a `sprintf` style
     format.  This will be applied prior to encoding the record, but only
     if the `format` attribute is also set.  Formats specified here may be
-    overriden for specific fields using the `format_fields` attribute.
+    overridden for specific fields using the `format_fields` attribute.
 
 - `format`
 
