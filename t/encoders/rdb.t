@@ -7,8 +7,8 @@ use lib 't/lib';
 
 use Data::Record::Serialize;
 
-use JSON::MaybeXS qw[ decode_json ];
-
+use File::Slurper qw[ read_text ];
+use File::Spec::Functions qw[ catfile ];
 my ( $s, $buf );
 
 ok(
@@ -16,7 +16,7 @@ ok(
         $s = Data::Record::Serialize->new(
             encode => 'rdb',
             output => \$buf,
-            fields => [ qw[ a b c ] ],
+            fields => [qw[ a b c ]],
           ),
           ;
     },
@@ -26,11 +26,10 @@ ok(
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
 
-is( $buf, <<'END', 'properly formatted' );
-a	b	c
-N	N	S
-1	2	nyuck nyuck
-1	2	
-END
+is(
+    $buf,
+    read_text( catfile( qw[ t data encoders data.rdb ] ) ),
+    'properly formatted'
+);
 
 done_testing;
