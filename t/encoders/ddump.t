@@ -27,7 +27,7 @@ $s->send( { a => 1, b => 2 } );
 
 my @VAR1;
 
-ok( lives { @VAR1 = eval "$buf" }, 'deserialize record', ) or diag $@;
+ok( lives { @VAR1 = eval $buf }, 'deserialize record', ) or diag $@;
 
 is(
     \@VAR1,
