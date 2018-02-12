@@ -47,6 +47,7 @@ sub setup {
 sub encode {
     my $self = shift;
 
+    no warnings 'uninitialized';
     join( "\t", @{ $_[0] }{ @{ $self->output_fields } } );
 }
 

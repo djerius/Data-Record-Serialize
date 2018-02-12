@@ -1,6 +1,7 @@
 #!perl
 
 use Test2::V0;
+use Test2::Plugin::NoWarnings;
 
 use lib 't/lib';
 
@@ -15,7 +16,7 @@ ok(
         $s = Data::Record::Serialize->new(
             encode => 'rdb',
             output => \$buf,
-            fields => [ qw( a b c d ) ],
+            fields => [ qw[ a b c ] ],
           ),
           ;
     },
@@ -23,11 +24,13 @@ ok(
 ) or diag $@;
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
+$s->send( { a => 1, b => 2 } );
 
 is( $buf, <<'END', 'properly formatted' );
-a	b	c	d
-N	N	S	S
-1	2	nyuck nyuck	
+a	b	c
+N	N	S
+1	2	nyuck nyuck
+1	2	
 END
 
 done_testing;
