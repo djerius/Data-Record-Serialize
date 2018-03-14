@@ -13,16 +13,13 @@ use namespace::clean;
 
 has types => (
     is      => 'rwp',
-    trigger => 1,
-    isa     => HashRef [ Enum [qw( N I S )] ] | ArrayRef,
+    isa => HashRef [ Enum [qw( N I S )] ] | ArrayRef,
+    trigger => sub {
+        $_[0]->clear_numeric_fields;
+        $_[0]->clear_output_types;
+    },
 );
 
-sub _trigger_types {
-
-    $_[0]->clear_numeric_fields;
-    $_[0]->clear_output_types;
-
-}
 
 has default_type => (
     is      => 'ro',
@@ -33,15 +30,14 @@ has default_type => (
 # input field names;
 has fields => (
     is      => 'rwp',
-    trigger => 1,
+    trigger => sub {
+        $_[0]->_clear_fieldh;
+        $_[0]->clear_output_types;
+        $_[0]->clear_output_fields;
+    },
     isa     => ArrayRef [Str],
 );
 
-sub _trigger_fields {
-    $_[0]->_clear_fieldh;
-    $_[0]->clear_output_types;
-    $_[0]->clear_output_fields;
-}
 
 # for quick lookup of field names
 has _fieldh => (
@@ -172,9 +168,9 @@ has format_types => (
 
 
 has rename_fields => (
-    is      => 'ro',
-    isa     => HashRef [Str],
-    coerce  => sub {
+    is     => 'ro',
+    isa    => HashRef [Str],
+    coerce => sub {
         return $_[0] unless is_HashRef( $_[0] );
 
         # remove renames which do nothing
@@ -183,14 +179,11 @@ has rename_fields => (
         return \%rename;
     },
     default => sub { {} },
-    trigger => 1,
+    trigger => sub {
+        $_[0]->clear_output_types;
+    },
 );
 
-sub _trigger_rename_fields {
-
-    $_[0]->clear_output_types;
-
-}
 
 has format => (
     is      => 'ro',
