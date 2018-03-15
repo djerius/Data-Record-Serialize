@@ -30,14 +30,29 @@ around 'setup' => sub {
     $self->_set_fields( [ keys %$data ] )
       unless $self->fields;
 
-    # create types on the fly from the first record if required
-    $self->_set_types_from_record( $data )
-      if $self->_need_types && !$self->types;
+    if ( $self->_need_types ) {
+
+        if ( $self->default_type ) {
+
+            if ( $self->has_types ) {
+                $self->types->{$_} = $self->default_type
+                  for grep { !defined $self->types->{$_} } @{ $self->fields };
+            }
+            else {
+
+                $self->_set_types( { map { $_ => $self->default_type } @{ $self->fields } } );
+            }
+
+        }
+
+        else {
+            $self->_set_types_from_record( $data )
+        }
+    }
 
     $orig->( $self );
 
     $self->_set__run_setup( 0 );
-
 };
 
 

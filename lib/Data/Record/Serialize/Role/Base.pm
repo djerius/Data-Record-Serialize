@@ -4,7 +4,7 @@ use Moo::Role;
 
 our $VERSION = '0.14';
 
-use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef ];
+use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef Undef ];
 
 use POSIX ();
 use Carp;
@@ -22,20 +22,20 @@ has types => (
 );
 
 has default_type => (
-    is      => 'ro',
-    isa     => Enum[ qw( N I S ) ],
-    default => 'S',
+    is        => 'ro',
+    isa       => Enum [qw( N I S )] | Undef,
 );
 
 # input field names;
 has fields => (
     is      => 'rwp',
+    isa     => ArrayRef [Str] | Enum[ 'all' ],
+    clearer => 1,
     trigger => sub {
         $_[0]->_clear_fieldh;
         $_[0]->clear_output_types;
         $_[0]->clear_output_fields;
     },
-    isa     => ArrayRef [Str],
 );
 
 
@@ -86,6 +86,8 @@ has _use_integer => (
     isa      => Bool,
     init_arg => undef,
     default  => 1,
+    # just in case need_types isn't explicitly set...
+    trigger  => sub { $_[0]->_set__need_types( 1 ) },
 );
 
 has _needs_eol => (
@@ -284,10 +286,11 @@ sub BUILD {
 
         }
 
-        # default to string if not specified
-        $self->types->{$_} = $self->default_type
-          for grep { !defined $self->types->{$_} } @{ $self->fields };
     }
+
+    # if fields eq 'all', clear out the attribute so that it will get
+    # filled in when the first record is sent.
+    $self->clear_fields if ! ref $self->fields;
 
     return;
 }

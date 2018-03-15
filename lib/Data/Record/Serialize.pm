@@ -235,42 +235,51 @@ C<S> - String
 Not all encoders support a separate integral type; in those cases
 integer fields are treated as general numeric fields.
 
-=head2 Output field and type determination
+=head2 Fields and their types
 
-The selection of output fields and determination of their types
-depends upon the C<fields>, C<types>, and C<default_type> attributes.
+Which fields are output and how their types are determined depends
+upon the C<fields>, C<types>, and C<default_type> attributes.
 
-=over
+In the following table:
 
-=item *
+ N   => not specified
+ Y   => specified
+ X   => doesn't matter
+ all => the string 'all'
 
-C<fields> specified, C<types> I<not> specified
+Automatic type determination is done by examining the first
+record send to the output stream.
 
-The fields in C<fields> are output. Types are derived from the values
-in the first record.
+  fields types default_type  Result
+  ------ ----- ------------  ------
 
-=item *
+  N/all   N        N         All fields are output.
+                             Types are automatically determined.
 
-C<fields> I<not> specified, C<types> specified
+  N/all   N        Y         All fields are output.
+                             Types are set to <default_type>.
 
-The fields by C<types> are output and are given the specified types.
+    Y     N        N         Fields in <fields> are output.
+                             Types are automatically determined.
 
-=item *
+    Y     Y        N         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
 
-C<fields> specified, C<types> specified
+    Y     Y        Y         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
 
-The fields specified by the C<fields> array are output with the types
-specified by C<types>.  For fields not specified in C<types>, the
-C<default_type> attribute value is used.
+   all    Y        N         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
 
-=item *
+   all    Y        Y         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
 
-C<fields> I<not> specified, C<types> I<not> specified
-
-The first record determines the fields and types (by examination).
-
-
-=back
+    N     Y        X         Fields in <types> are output.
+                             Types are specified by <types>.
 
 
 =head1 INTERFACE
@@ -305,9 +314,10 @@ It is an error to specify a sink if the encoder already acts as one.
 
 =item C<default_type>=I<type>
 
-If the C<types> attribute was specified, this type is assigned to
-fields given in the C<fields> attributes which were not specified via
-the C<types> attribute.
+If set, output fields whose types were not
+specified via the C<types> attribute will be assigned this type.
+To understand how this attribute works in concert with L</fields> and
+L</types>, please see L</Fields and their types>.
 
 =item C<types>
 
@@ -322,36 +332,37 @@ order, provided the encoder permits it (see below, however).  For example,
   types => { c => 'N', a => 'N', b => 'N' }
 
 If C<fields> is specified, then its order will override that specified
-here.  If no type is specified for elements in C<fields>, they will
-default to having the type specified by the C<default_type> attribute.
-For example,
+here.
 
-  types => [ c => 'N', a => 'N' ],
-  fields => [ qw( a b c ) ],
-  default_type => 'I',
+To understand how this attribute works in concert with L</fields> and
+L</default_type>, please see L</Fields and their types>.
 
-will result in fields being output in the order
-
-   a b c
-
-with types
-
-   a => 'N',
-   b => 'I',
-   c => 'N',
 
 =item C<fields>
+
+Which fields to output.  It may be one of:
+
+=over
+
+=item * 
 
 An array containing the input names of the fields to be output. The
 fields will be output in the specified order, provided the encoder
 permits it.
 
-If this attribute is not specified, the fields specified by the
-C<types> attribute will be output.  If that is not specified, the
-fields as found in the first data record will be output.
+=item *
 
-If a field name is specified in C<fields> but no type is defined in
-C<types>, it defaults to what is specified via C<default_type>.
+The string C<all>, indicating that all input fields will be output.
+
+=item *
+
+Unspecified or undefined.
+
+=back
+
+To understand how this attribute works in concert with L</types> and
+L</default_type>, please see L</Fields and their types>.
+
 
 =item C<rename_fields>
 
