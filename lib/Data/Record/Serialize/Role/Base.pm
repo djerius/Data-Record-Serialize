@@ -14,12 +14,12 @@ use namespace::clean;
 has types => (
     is      => 'rwp',
     isa => HashRef [ Enum [qw( N I S )] ] | ArrayRef,
+    predicate => 1,
     trigger => sub {
         $_[0]->clear_numeric_fields;
         $_[0]->clear_output_types;
     },
 );
-
 
 has default_type => (
     is      => 'ro',
@@ -126,6 +126,8 @@ has output_types => (
 
         my %types;
 
+        return unless $self->has_types;
+
         my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
         @types{@int_fields} = @{ $self->types }{@int_fields};
 
@@ -133,7 +135,7 @@ has output_types => (
             $_ = 'N' foreach grep { $_ eq 'I' } values %types;
         }
 
-        if ( defined $self->_map_types ) {
+        if ( $self->_has_map_types ) {
 
             $types{$_} = $self->_map_types->{ $types{$_} } foreach keys %types;
 
@@ -153,8 +155,11 @@ has output_types => (
 
 sub _trigger_output_types { }
 
-
-has _map_types => ( is => 'rwp', init_arg => undef, );
+has _map_types => (
+    is        => 'rwp',
+    init_arg  => undef,
+    predicate => 1,
+);
 
 has format_fields => (
     is  => 'ro',

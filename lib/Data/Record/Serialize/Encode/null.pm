@@ -8,6 +8,7 @@ our $VERSION = '0.14';
 
 use namespace::clean;
 
+has '+_need_types' => ( is => 'rwp', default => 0 );
 
 =begin pod_coverage
 

@@ -10,13 +10,8 @@ use YAML::Any qw[ Dump ];
 
 use namespace::clean;
 
-before BUILD => sub {
-
-    my $self = shift;
-
-    $self->_set__need_types( 0 );
-    $self->_set__needs_eol( 1 );
-};
+has '+_need_types' => ( is => 'rwp', default => 0 );
+has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
 =begin pod_coverage
 

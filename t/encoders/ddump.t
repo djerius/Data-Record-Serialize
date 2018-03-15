@@ -24,6 +24,7 @@ ok(
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
 
+ok ( ! $s->has_types, "no types were derived" );
 
 my @VAR1;
 

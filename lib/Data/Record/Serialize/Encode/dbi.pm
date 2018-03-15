@@ -221,20 +221,14 @@ has _cache => (
     default  => sub { [] },
 );
 
-before BUILD => sub {
+has '+_use_integer' => ( is => 'rwp', default => 1 );
 
-    my $self = shift;
+has '+_need_types' => ( is => 'rwp', default => 1 );
 
-    $self->_set__map_types( {
-        S => 'text',
-        N => 'real',
-        I => 'integer'
-    } );
-
-    $self->_set__use_integer( 1 );
-    $self->_set__need_types( 1 );
-
-};
+has '+_map_types' => (
+    is      => 'rwp',
+    default => sub { {S => 'text', N => 'real', I => 'integer'} },
+);
 
 sub _table_exists {
 

@@ -6,16 +6,22 @@ use Moo::Role;
 
 our $VERSION = '0.14';
 
-before BUILD => sub {
-
-    my $self = shift;
-
-    $self->_set__use_integer( 0 );
-    $self->_set__map_types( { N => 'N', I => 'N', S => 'S' } );
-
-    $self->_set__needs_eol( 1 );
-
-};
+has '+_need_types' => (
+    is      => 'rwp',
+    default => 1,
+);
+has '+_use_integer' => (
+    is      => 'rwp',
+    default => 0,
+);
+has '+_map_types' => (
+    is      => 'rwp',
+    default => sub { { N => 'N', I => 'N', S => 'S' } },
+);
+has '+_needs_eol' => (
+    is      => 'rwp',
+    default => 1,
+);
 
 use namespace::clean;
 

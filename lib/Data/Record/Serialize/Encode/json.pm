@@ -10,13 +10,8 @@ use JSON::MaybeXS qw[ encode_json ];
 
 use namespace::clean;
 
-before BUILD => sub {
-
-    my $self = shift;
-
-    $self->_set__numify( 1 );
-    $self->_set__needs_eol( 1 );
-};
+has '+_numify'    => ( is => 'rwp', default => 1 );
+has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
 =begin pod_coverage
 
