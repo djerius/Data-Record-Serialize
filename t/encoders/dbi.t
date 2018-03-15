@@ -3,7 +3,7 @@
 use Test2::V0;
 use Test2::Tools::AfterSubtest;
 
-use lib 't/lib';
+use Test::Lib;
 
 use Data::Record::Serialize;
 
