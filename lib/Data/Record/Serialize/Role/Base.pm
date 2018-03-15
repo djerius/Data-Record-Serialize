@@ -296,9 +296,9 @@ sub _set_types_from_record {
 
     my ( $self, $data ) = @_;
 
-    my %types;
+    my $types = $self->has_types ? $self->types : {};
 
-    for my $field ( @{ $self->fields } ) {
+    for my $field ( grep !defined $types->{$_}, @{ $self->fields } ) {
 
         my $value = $data->{$field};
         my $def = Scalar::Util::looks_like_number( $value ) ? 'N' : 'S';
@@ -308,11 +308,10 @@ sub _set_types_from_record {
           && $def eq 'N'
           && POSIX::floor( $value ) == POSIX::ceil( $value );
 
-        $types{$field} = $def;
+        $types->{$field} = $def;
     }
 
-    $self->_set_types( \%types );
-
+    $self->_set_types( $types );
 }
 
 
