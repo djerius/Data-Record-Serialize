@@ -169,8 +169,10 @@ has format_fields => (
 );
 
 has format_types => (
-    is  => 'ro',
-    isa => HashRef [Str],
+    is      => 'ro',
+    isa     => HashRef [Str],
+    # we'll need to gather types
+    trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
 );
 
 
@@ -250,11 +252,6 @@ has _format => (
 sub BUILD {
 
     my $self = shift;
-
-    # if we're asked to format based on types, make sure
-    # we create them if needed.
-    $self->_set__need_types( 1 )
-      if $self->format_types && %{ $self->format_types };
 
     # if types is passed, set fields if it's not set.
     # convert types to hash if it's an array
