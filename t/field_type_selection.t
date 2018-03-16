@@ -28,6 +28,7 @@ subtest "N, N, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -38,6 +39,7 @@ subtest "N, N, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -63,6 +65,7 @@ subtest "all, N, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -73,6 +76,7 @@ subtest "all, N, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -99,6 +103,7 @@ subtest "N, N, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -109,6 +114,7 @@ subtest "N, N, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -134,6 +140,7 @@ subtest "all, N, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -144,6 +151,7 @@ subtest "all, N, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -168,6 +176,7 @@ subtest "Y, N, N" => sub {
         bag {
             item 'a';
             item 'b';
+            end;
         },
         ,
         'input fields'
@@ -177,6 +186,7 @@ subtest "Y, N, N" => sub {
         bag {
             item 'a';
             item 'b';
+            end;
         },
         'output fields'
     );
@@ -204,6 +214,7 @@ subtest "Y, Y, N" => sub {
         bag {
             item 'a';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -213,6 +224,7 @@ subtest "Y, Y, N" => sub {
         bag {
             item 'a';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -241,6 +253,7 @@ subtest "Y, Y, Y" => sub {
         bag {
             item 'a';
             item 'b';
+            end;
         },
         ,
         'input fields'
@@ -250,6 +263,7 @@ subtest "Y, Y, Y" => sub {
         bag {
             item 'a';
             item 'b';
+            end;
         },
         'output fields'
     );
@@ -278,6 +292,7 @@ subtest "all, Y, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -288,6 +303,7 @@ subtest "all, Y, N" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -317,6 +333,7 @@ subtest "all, Y, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         ,
         'input fields'
@@ -327,6 +344,7 @@ subtest "all, Y, Y" => sub {
             item 'a';
             item 'b';
             item 'c';
+            end;
         },
         'output fields'
     );
@@ -351,17 +369,12 @@ subtest "N, Y, Y" => sub {
 
     is(
         $s->fields,
-        bag {
-            item 'a';
-        },
-        ,
+        [ 'a' ],
         'input fields'
     );
     is(
         $s->output_fields,
-        bag {
-            item 'a';
-        },
+        [ 'a' ],
         'output fields'
     );
 
@@ -384,17 +397,12 @@ subtest "N, Y, N" => sub {
 
     is(
         $s->fields,
-        bag {
-            item 'a';
-        },
-        ,
+        [ 'a' ],
         'input fields'
     );
     is(
         $s->output_fields,
-        bag {
-            item 'a';
-        },
+        [ 'a' ],
         'output fields'
     );
 
