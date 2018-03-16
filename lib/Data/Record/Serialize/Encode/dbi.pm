@@ -352,8 +352,8 @@ sub _empty_cache {
 
         eval {
             $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
-            $self->_dbh->commit;
         };
+        $self->_dbh->commit;
 
         # don't bother rolling back aborted transactions;
         # individual inserts are independent of each other.
