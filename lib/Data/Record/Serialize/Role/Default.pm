@@ -33,21 +33,13 @@ around 'setup' => sub {
     if ( $self->_need_types ) {
 
         if ( $self->default_type ) {
-
-            if ( $self->has_types ) {
-                $self->types->{$_} = $self->default_type
-                  for grep { !defined $self->types->{$_} } @{ $self->fields };
-            }
-            else {
-
-                $self->_set_types( { map { $_ => $self->default_type } @{ $self->fields } } );
-            }
-
+            $self->_set_types_from_default;
         }
-
         else {
-            $self->_set_types_from_record( $data )
+            $self->_set_types_from_record( $data );
         }
+
+        $self->_set__need_types( 0 );
     }
 
     $orig->( $self );

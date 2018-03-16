@@ -285,9 +285,27 @@ sub BUILD {
 
     }
 
-    # if fields eq 'all', clear out the attribute so that it will get
-    # filled in when the first record is sent.
-    $self->clear_fields if ! ref $self->fields;
+    if ( defined $self->fields ) {
+
+        if ( ref $self->fields ) {
+
+            # in this specific case everything can be done before the first
+            # record is read.  this is kind of overkill, but at least one
+            # test depended upon being able to determine types prior
+            # to sending the first record, so need to do this here rather
+            # than in Default::setup
+            if ( $self->_need_types && defined $self->default_type ) {
+                $self->_set_types_from_default;
+                $self->_set__need_types( 0 );
+            }
+        }
+
+        # if fields eq 'all', clear out the attribute so that it will get
+        # filled in when the first record is sent.
+        else {
+            $self->clear_fields;
+        }
+    }
 
     return;
 }
@@ -310,6 +328,18 @@ sub _set_types_from_record {
 
         $types->{$field} = $def;
     }
+
+    $self->_set_types( $types );
+}
+
+sub _set_types_from_default {
+
+    my $self = shift;
+
+    my $types = $self->has_types ? $self->types : {};
+
+    $types->{$_} = $self->default_type
+      for grep { !defined $types->{$_} } @{ $self->fields };
 
     $self->_set_types( $types );
 }
