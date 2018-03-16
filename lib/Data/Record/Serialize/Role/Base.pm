@@ -367,4 +367,6 @@ __END__
 
 =head3 types
 
+=head3 has_types
+
 =end pod_coverage
