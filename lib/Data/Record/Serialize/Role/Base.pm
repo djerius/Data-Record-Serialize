@@ -345,13 +345,6 @@ sub _set_types_from_default {
 }
 
 
-sub DEMOLISH {
-
-    $_[0]->close;
-
-    return;
-}
-
 1;
 
 __END__
@@ -359,8 +352,6 @@ __END__
 =begin pod_coverage
 
 =head3 BUILD
-
-=head3 DEMOLISH
 
 =head3 default_type
 

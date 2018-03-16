@@ -94,6 +94,12 @@ before 'send' => sub {
 
 };
 
+sub DEMOLISH {
+
+    $_[0]->close;
+
+    return;
+}
 
 1;
 
@@ -106,6 +112,8 @@ __END__
 =head3 send
 
 =head3 setup
+
+=head3 DEMOLISH
 
 =end pod_coverage
 
