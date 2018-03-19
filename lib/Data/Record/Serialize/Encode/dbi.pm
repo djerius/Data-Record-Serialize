@@ -4,6 +4,14 @@ package Data::Record::Serialize::Encode::dbi;
 
 use Moo::Role;
 
+use Data::Record::Serialize::Error { errors =>
+  [ qw( param
+        connect
+        schema
+        create
+        insert
+   )] }, -all;
+
 our $VERSION = '0.14';
 
 use Data::Record::Serialize::Types -types;
@@ -15,7 +23,6 @@ use Types::Standard -types;
 use List::Util qw[ pairmap ];
 
 use DBI;
-use Carp;
 
 use namespace::clean;
 
@@ -271,7 +278,7 @@ sub setup {
     return if $self->_dbh;
 
     my @dsn = DBI->parse_dsn( $self->dsn )
-      or croak( "unable to parse DSN: ", $self->dsn );
+      or error( 'param', "unable to parse DSN: ", $self->dsn );
     my $dbi_driver = $dsn[1];
 
     my $producer = $producer{$dbi_driver} || $dbi_driver;
@@ -286,7 +293,7 @@ sub setup {
 
     $self->_set__dbh(
         DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
-      or croak( 'error connection to ', $self->dsn, "\n" );
+      or error( 'connect', 'error connecting to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
@@ -297,19 +304,19 @@ sub setup {
             from => sub {
                 my $schema = $_[0]->schema;
                 my $table = $schema->add_table( name => $self->_fq_table_name )
-                  or croak $schema->error;
+                  or error( 'schema', $schema->error );
 
                 for my $field_name ( @{ $self->output_fields } ) {
 
                     $table->add_field(
                         name      => $field_name,
                         data_type => $self->output_types->{$field_name}
-                    ) or croak $table->error;
+                    ) or error( 'schema',  $table->error );
                 }
 
                 if ( @{ $self->primary } ) {
                     $table->primary_key( @{ $self->primary } )
-                      or croak $table->error;
+                      or error( 'schema', $table->error );
                 }
 
                 1;
@@ -321,12 +328,12 @@ sub setup {
 
 
         my $sql = $tr->translate
-          or croak $tr->error;
+          or error( 'schema', $tr->error );
 
         # print STDERR $sql;
         eval { $self->_dbh->do( $sql ); };
 
-        croak( "error in table creation: $@:\n$sql\n" )
+        error( 'create', { msg => "error in table creation: $@", payload => $sql } )
           if $@;
 
         $self->_dbh->commit if $self->batch;
@@ -353,11 +360,13 @@ sub _empty_cache {
         eval {
             $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
         };
+        my $error = $@;
         $self->_dbh->commit;
 
         # don't bother rolling back aborted transactions;
         # individual inserts are independent of each other.
-        croak "Transaction aborted: $@" if $@;
+        error( "insert", { msg => "Transaction aborted: $error", payload => $self } )
+          if $error;
 
         @{ $self->_cache } = ();
     }
@@ -436,9 +445,9 @@ sub close {
 =cut
 
 
-sub say    { croak }
-sub print  { croak }
-sub encode { croak }
+sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
+sub print  { error( 'Encode::stub_method', 'internal error: stub method <print> invoked' ) }
+sub encode { error( 'Encode::stub_method', 'internal error: stub method <encode> invoked' ) }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
@@ -483,6 +492,13 @@ Records are by default written to the database in batches (see the
 C<batch> attribute) to improve performance.  Each batch is performed
 as a single transaction.  If there is an error during the transaction,
 record insertions during the transaction are I<not> rolled back.
+
+=head2 Errors
+
+Transaction errors result in an exception in the
+C<Data::Record::Serialize::Error::Encode::dbi::insert> class. See
+L<Data::Record::Serialize::Error> for more information on exception
+objects.
 
 =head1 ATTRIBUTES
 

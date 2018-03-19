@@ -6,7 +6,8 @@ use 5.010000;
 
 use strict;
 use warnings;
-use Carp;
+
+use Data::Record::Serialize::Error -all;
 
 our $VERSION = '0.14';
 
@@ -27,7 +28,7 @@ use namespace::clean;
 sub make_variant {
     my ( $class, $target, %attr ) = @_;
 
-    croak( "must specify 'encode' attribute\n" )
+    error( 'attribute::value', "must specify <encode> attribute" )
       unless defined $attr{encode};
 
     with 'Data::Record::Serialize::Role::Base';
@@ -38,8 +39,7 @@ sub make_variant {
 
     if ( $target->does( 'Data::Record::Serialize::Role::Sink' ) ) {
 
-        croak(
-            "encoder ($attr{encode}) is already a sink; don't specify a sink attribute\n"
+    error( 'attribute::value', "encoder ($attr{encode}) is already a sink; don't specify a sink attribute\n"
         ) if defined $attr{sink};
     }
 
@@ -283,6 +283,11 @@ record send to the output stream.
 
 
 =head1 INTERFACE
+
+=head2 Errors
+
+Most errors result in exception objects being thrown, typically in the
+L<Data::Record::Serialize::Error> hierarchy.
 
 =head2 B<new>
 

@@ -5,6 +5,8 @@ package Data::Record::Serialize::Sink::stream;
 
 use Moo::Role;
 
+use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
+
 our $VERSION = '0.14';
 
 use IO::File;
@@ -26,7 +28,7 @@ has fh => (
         return ( ! defined $self->output || $self->output eq '-' )
           ? \*STDOUT
           : ( IO::File->new( $self->output, 'w' )
-              or croak( "unable to create @{[ $self->output ]}\n" ) );
+              or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
 
 );

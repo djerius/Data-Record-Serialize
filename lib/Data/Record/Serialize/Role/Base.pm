@@ -4,10 +4,11 @@ use Moo::Role;
 
 our $VERSION = '0.14';
 
+use Data::Record::Serialize::Error -all;
+
 use Types::Standard qw[ ArrayRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
 
 use POSIX ();
-use Carp;
 
 use namespace::clean;
 
@@ -278,9 +279,7 @@ sub BUILD {
             }
         }
         else {
-
-            croak( "types attribute must be a hash or an array\n" );
-
+            error( '::attribute::value', "internal error" );
         }
 
     }
