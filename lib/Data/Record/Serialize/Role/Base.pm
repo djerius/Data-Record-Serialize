@@ -16,21 +16,21 @@ has types => (
     is        => 'rwp',
     isa       => HashRef [ Enum [qw( N I S )] ] | CycleTuple[ Str, Enum[ qw( N I S ) ] ],
     predicate => 1,
-    trigger => sub {
+    trigger   => sub {
         $_[0]->clear_numeric_fields;
         $_[0]->clear_output_types;
     },
 );
 
 has default_type => (
-    is        => 'ro',
-    isa       => Enum [qw( N I S )] | Undef,
+    is  => 'ro',
+    isa => Enum [qw( N I S )] | Undef,
 );
 
 # input field names;
 has fields => (
     is      => 'rwp',
-    isa     => ArrayRef [Str] | Enum[ 'all' ],
+    isa     => ArrayRef [Str] | Enum ['all'],
     clearer => 1,
     trigger => sub {
         $_[0]->_clear_fieldh;
@@ -88,7 +88,7 @@ has _use_integer => (
     init_arg => undef,
     default  => 1,
     # just in case need_types isn't explicitly set...
-    trigger  => sub { $_[0]->_set__need_types( 1 ) },
+    trigger => sub { $_[0]->_set__need_types( 1 ) },
 );
 
 has _needs_eol => (
@@ -170,8 +170,8 @@ has format_fields => (
 );
 
 has format_types => (
-    is      => 'ro',
-    isa     => HashRef [Str],
+    is  => 'ro',
+    isa => HashRef [Str],
     # we'll need to gather types
     trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
 );
