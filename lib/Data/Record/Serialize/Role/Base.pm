@@ -4,7 +4,7 @@ use Moo::Role;
 
 our $VERSION = '0.14';
 
-use Types::Standard qw[ ArrayRef HashRef Enum Str Bool is_HashRef Undef ];
+use Types::Standard qw[ ArrayRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
 
 use POSIX ();
 use Carp;
@@ -12,8 +12,8 @@ use Carp;
 use namespace::clean;
 
 has types => (
-    is      => 'rwp',
-    isa => HashRef [ Enum [qw( N I S )] ] | ArrayRef,
+    is        => 'rwp',
+    isa       => HashRef [ Enum [qw( N I S )] ] | CycleTuple[ Str, Enum[ qw( N I S ) ] ],
     predicate => 1,
     trigger => sub {
         $_[0]->clear_numeric_fields;
