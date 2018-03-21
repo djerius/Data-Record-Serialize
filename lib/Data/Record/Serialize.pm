@@ -47,7 +47,7 @@ sub make_variant {
 
     else {
 
-	# default sink
+        # default sink
         my $sink = 'Data::Record::Serialize::Sink::'
           . ( $attr{sink} ? lc $attr{sink} : 'stream' );
 
@@ -90,12 +90,12 @@ __END__
 
     # cleanup record before sending
     $s = Data::Record::Serialize->new( encode => 'json',
-	fields => [ qw( obsid chip_id phi theta ) ],
+        fields => [ qw( obsid chip_id phi theta ) ],
         format => 1,
-	format_types => { N => '%0.4f' },
-	format_fields => { obsid => '%05d' },
-	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S',
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
                    phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
@@ -103,15 +103,15 @@ __END__
 
     # send to an SQLite database
     $s = Data::Record::Serialize->new(
-	encode => 'dbi',
-	dsn => [ 'SQLite', [ dbname => $dbname ] ],
-	table => 'stuff',
+        encode => 'dbi',
+        dsn => [ 'SQLite', [ dbname => $dbname ] ],
+        table => 'stuff',
         format => 1,
-	fields => [ qw( obsid chip_id phi theta ) ],
-	format_types => { N => '%0.4f' },
-	format_fields => { obsid => '%05d' },
-	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S',
+        fields => [ qw( obsid chip_id phi theta ) ],
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
                    phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
@@ -351,7 +351,7 @@ Which fields to output.  It may be one of:
 
 =over
 
-=item * 
+=item *
 
 An array containing the input names of the fields to be output. The
 fields will be output in the specified order, provided the encoder
@@ -511,7 +511,3 @@ The input field names for those fields deemed to be numeric.
 Other modules:
 
 L<B<Data::Serializer>>
-
-
-
-

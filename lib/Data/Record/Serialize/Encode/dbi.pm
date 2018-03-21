@@ -372,6 +372,7 @@ Flush the queue of records to the database. It returns true if
 all of the records have been successfully written.
 
 If writing fails:
+
 =over
 
 =item *
@@ -447,7 +448,7 @@ sub flush {
 
   $s->send( \%record );
 
-Send a record to the database. 
+Send a record to the database.
 If there is an error, an exception object (with class
 C<Data::Record::Serialize::Error::Encode::dbi::insert>) will be
 thrown, and the record which failed to be written will be available
@@ -596,8 +597,8 @@ L<B<DBI>>.
 It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
 L<B<Data::Record::Serialize::Role::Sink>> roles.
 
-B<You cannot construct this directly; you must use
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
+B<You cannot construct this directly>. You must use
+L<Data::Record::Serialize/new>.
 
 =head2 Types
 
