@@ -298,6 +298,7 @@ sub setup {
     my %attr = (
         AutoCommit => !$self->batch,
         RaiseError => 1,
+        PrintError => 0,
     );
 
     $attr{sqlite_allow_multiple_statements} = 1
