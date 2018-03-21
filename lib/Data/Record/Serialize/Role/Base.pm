@@ -2,7 +2,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Data::Record::Serialize::Error -all;
 

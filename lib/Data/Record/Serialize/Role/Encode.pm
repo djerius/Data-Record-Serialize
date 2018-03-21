@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 requires 'encode';
 
