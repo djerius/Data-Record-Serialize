@@ -1,6 +1,6 @@
-requires "Carp" => "0";
 requires "DBI" => "0";
 requires "Data::Dumper" => "0";
+requires "Exporter::Shiny" => "0";
 requires "Hash::Util" => "0";
 requires "IO::File" => "0";
 requires "JSON::MaybeXS" => "0";
@@ -14,10 +14,12 @@ requires "Type::Library" => "0";
 requires "Type::Utils" => "0";
 requires "Types::Standard" => "1.000005";
 requires "YAML::Any" => "0";
+requires "custom::failures" => "0";
 requires "namespace::clean" => "0";
 requires "perl" => "5.01000";
 requires "strict" => "0";
 requires "warnings" => "0";
+requires "warnings::register" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -32,9 +34,9 @@ on 'test' => sub {
   requires "Test2::Plugin::NoWarnings" => "0";
   requires "Test2::Tools::AfterSubtest" => "0";
   requires "Test2::V0" => "0";
+  requires "Test::Lib" => "0";
   requires "Test::More" => "0";
   requires "YAML::Any" => "0";
-  requires "lib" => "0";
 };
 
 on 'test' => sub {

@@ -100,31 +100,58 @@ field. **Data::Record::Serialize** recognizes three types:
 Not all encoders support a separate integral type; in those cases
 integer fields are treated as general numeric fields.
 
-## Output field and type determination
+## Fields and their types
 
-The selection of output fields and determination of their types
-depends upon the `fields`, `types`, and `default_type` attributes.
+Which fields are output and how their types are determined depends
+upon the `fields`, `types`, and `default_type` attributes.
 
-- `fields` specified, `types` _not_ specified
+In the following table:
 
-    The fields in `fields` are output. Types are derived from the values
-    in the first record.
+    N   => not specified
+    Y   => specified
+    X   => doesn't matter
+    all => the string 'all'
 
-- `fields` _not_ specified, `types` specified
+Automatic type determination is done by examining the first
+record send to the output stream.
 
-    The fields by `types` are output and are given the specified types.
+    fields types default_type  Result
+    ------ ----- ------------  ------
 
-- `fields` specified, `types` specified
+    N/all   N        N         All fields are output.
+                               Types are automatically determined.
 
-    The fields specified by the `fields` array are output with the types
-    specified by `types`.  For fields not specified in `types`, the
-    `default_type` attribute value is used.
+    N/all   N        Y         All fields are output.
+                               Types are set to <default_type>.
 
-- `fields` _not_ specified, `types` _not_ specified
+      Y     N        N         Fields in <fields> are output.
+                               Types are automatically determined.
 
-    The first record determines the fields and types (by examination).
+      Y     Y        N         Fields in <fields> are output.
+                               Fields in <types> get the specified type.
+                               Types for other fields are automatically determined.
+
+      Y     Y        Y         Fields in <fields> are output.
+                               Fields in <types> get the specified type.
+                               Types for other fields are set to <default_type>.
+
+     all    Y        N         All fields are output.
+                               Fields in <types> get the specified type.
+                               Types for other fields are automatically determined.
+
+     all    Y        Y         All fields are output.
+                               Fields in <types> get the specified type.
+                               Types for other fields are set to <default_type>.
+
+      N     Y        X         Fields in <types> are output.
+                               Types are specified by <types>.
 
 # INTERFACE
+
+## Errors
+
+Most errors result in exception objects being thrown, typically in the
+[Data::Record::Serialize::Error](https://metacpan.org/pod/Data::Record::Serialize::Error) hierarchy.
 
 ## **new**
 
@@ -154,9 +181,10 @@ The available attributes are:
 
 - `default_type`=_type_
 
-    If the `types` attribute was specified, this type is assigned to
-    fields given in the `fields` attributes which were not specified via
-    the `types` attribute.
+    If set, output fields whose types were not
+    specified via the `types` attribute will be assigned this type.
+    To understand how this attribute works in concert with ["fields"](#fields) and
+    ["types"](#types), please see ["Fields and their types"](#fields-and-their-types).
 
 - `types`
 
@@ -171,36 +199,23 @@ The available attributes are:
         types => { c => 'N', a => 'N', b => 'N' }
 
     If `fields` is specified, then its order will override that specified
-    here.  If no type is specified for elements in `fields`, they will
-    default to having the type specified by the `default_type` attribute.
-    For example,
+    here.
 
-        types => [ c => 'N', a => 'N' ],
-        fields => [ qw( a b c ) ],
-        default_type => 'I',
-
-    will result in fields being output in the order
-
-        a b c
-
-    with types
-
-        a => 'N',
-        b => 'I',
-        c => 'N',
+    To understand how this attribute works in concert with ["fields"](#fields) and
+    ["default\_type"](#default_type), please see ["Fields and their types"](#fields-and-their-types).
 
 - `fields`
 
-    An array containing the input names of the fields to be output. The
+    Which fields to output.  It may be one of:
+
+    - An array containing the input names of the fields to be output. The
     fields will be output in the specified order, provided the encoder
     permits it.
+    - The string `all`, indicating that all input fields will be output.
+    - Unspecified or undefined.
 
-    If this attribute is not specified, the fields specified by the
-    `types` attribute will be output.  If that is not specified, the
-    fields as found in the first data record will be output.
-
-    If a field name is specified in `fields` but no type is defined in
-    `types`, it defaults to what is specified via `default_type`.
+    To understand how this attribute works in concert with ["types"](#types) and
+    ["default\_type"](#default_type), please see ["Fields and their types"](#fields-and-their-types).
 
 - `rename_fields`
 
@@ -248,7 +263,7 @@ global destruction.
 
 ## **output\_fields**
 
-    $array_ref = $s->fields;
+    $array_ref = $s->output_fields;
 
 The names of the transformed output fields, in order of output (not
 obeyed by all encoders);
