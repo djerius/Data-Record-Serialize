@@ -222,7 +222,19 @@ A trace setting passed to  L<B<DBI>>.
 
 has dbitrace => ( is => 'ro', );
 
-has _cache => (
+=method C<queue>
+
+  $queue = $obj->queue;
+
+The queue containing records not yet successfully transmitted
+to the database.  This is only of interest if L</batch> is not C<0>.
+
+Each element is an array containing values to be inserted into the database,
+in the same order as the fields in L<Data::Serialize/output_fields>.
+
+=cut
+
+has queue => (
     is       => 'ro',
     init_arg => undef,
     default  => sub { [] },
@@ -351,34 +363,99 @@ sub setup {
     return;
 }
 
-sub _empty_cache {
+=method flush
+
+  $s->flush;
+
+Flush the queue of records to the database. It returns true if
+all of the records have been successfully written.
+
+If writing fails:
+=over
+
+=item *
+
+Writing of records ceases.
+
+=item *
+
+The failing record is left at the head of the queue.  This ensures
+that it is possible to retry writing the record.
+
+=item *
+
+an exception object (in the
+C<Data::Record::Serialize::Error::Encode::dbi::insert> class) will be
+thrown.  The failing record (in its final form after formatting, etc)
+is available via the object's C<payload> method.
+
+=back
+
+If a record fails to be written, it will still be queued for the next
+attempt at writing to the database.  If this behavior is undesired,
+make sure to remove it from the queue:
+
+  use Data::Dumper;
+
+  if ( ! eval { $output->flush } ) {
+      warn "$@", Dumper( $@->payload );
+      pop $output->queue->@*;
+  }
+
+As an example of completely flushing the queue while notifying of errors:
+
+  use Data::Dumper;
+
+  until ( eval { $output->flush } ) {
+      warn "$@", Dumper( $@->payload );
+      pop $output->queue->@*;
+  }
+
+=cut
+
+sub flush {
 
     my $self = shift;
 
-    if ( @{ $self->_cache } ) {
+    my $queue = $self->queue;
 
+    if ( @{ $queue } ) {
+
+        my $last;
         eval {
-            $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
+            $self->_sth->execute( @$last )
+              while $last = shift @{ $queue };
         };
+
         my $error = $@;
         $self->_dbh->commit;
 
-        # don't bother rolling back aborted transactions;
-        # individual inserts are independent of each other.
-        error( "insert", { msg => "Transaction aborted: $error", payload => $self } )
-          if $error;
+        if ( $error ) {
+            unshift @{ $queue }, $last;
 
-        @{ $self->_cache } = ();
+            my %query;
+            @query{ @{ $self->output_fields } } = @$last;
+            error( "insert", { msg => "Transaction aborted: $error", payload => \%query } );
+        }
     }
 
-    return;
+    1;
 }
 
-=begin pod_coverage
+=method send
 
-=head3 send
+  $s->send( \%record );
 
-=end pod_coverage
+Send a record to the database. 
+If there is an error, an exception object (with class
+C<Data::Record::Serialize::Error::Encode::dbi::insert>) will be
+thrown, and the record which failed to be written will be available
+via the object's C<payload> method.
+
+If in L</batch> mode, the record is queued for later transmission.
+When the number of records queued reaches that specified by the
+L</batch> attribute, the C<flush> method is called.  See L</flush> for
+more information on how errors are handled.
 
 =cut
 
@@ -388,14 +465,19 @@ sub send {
 
     if ( $self->batch ) {
 
-        push @{ $self->_cache }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
+        push @{ $self->queue }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
 
-        $self->_empty_cache
-          if @{ $self->_cache } == $self->batch;
+        $self->flush
+          if @{ $self->queue } == $self->batch;
 
     }
     else {
-        $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
+
+        eval {
+            $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
+        };
+        error( "insert", { msg => "record insertion failed: $@", payload => $_[0] } )
+          if $@;
     }
 
 }
@@ -410,11 +492,24 @@ after '_trigger_output_types' => sub {
 };
 
 
-=begin pod_coverage
+=method close
 
-=head3 close
+  $s->close;
 
-=end pod_coverage
+Close the database handle. If writing is batched, records in the queue
+are written to the database via L</flush>. An exception will be thrown
+if a record cannot be written.  See L</flush> for more details.
+
+As an example of draining the queue while notifying of errors:
+
+  use Data::Dumper;
+
+  until ( eval { $output->close } ) {
+      warn "$@", Dumper( $@->payload );
+      pop $output->queue->@*;
+  }
+
+
 
 =cut
 
@@ -422,12 +517,38 @@ sub close {
 
     my $self = shift;
 
-    $self->_empty_cache
+    $self->flush
       if $self->batch;
 
     $self->_dbh->disconnect
       if defined $self->_dbh;
+
+    1;
 }
+
+
+=method DEMOLISH
+
+This method is called when the object is destroyed.  It closes the
+database handle B<but does not flush the record queue>.
+
+A warning is emitted if the record queue is not empty; turn off the
+C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
+
+=cut
+
+sub DEMOLISH {
+
+    my $self = shift;
+
+    warnings::warnif( 'Data::Record::Serialize::Encode::dbi::queue', __PACKAGE__.": record queue is not empty in object destruction" )
+        if @{ $self->queue };
+
+    $self->_dbh->disconnect
+      if defined $self->_dbh;
+
+}
+
 
 # these are required by the Sink/Encode interfaces but should never be
 # called in the ordinary run of things.

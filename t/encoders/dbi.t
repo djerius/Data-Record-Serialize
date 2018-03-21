@@ -7,6 +7,8 @@ use Test::Lib;
 
 use Data::Record::Serialize;
 
+use warnings;
+
 eval 'use DBI; 1'
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
 
@@ -109,8 +111,7 @@ for my $dbinfo ( @DBDs ) {
             ) or diag $@;
 
             $s->send( {%$_} ) foreach @test_data;
-
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
 
@@ -141,7 +142,7 @@ for my $dbinfo ( @DBDs ) {
             ok( !$s->_dbh->{AutoCommit},
                 "Ensure that AutoCommit is really off" );
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -164,8 +165,7 @@ for my $dbinfo ( @DBDs ) {
             ) or diag $@;
 
             $s->send( {%$_} ) foreach @test_data;
-
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -189,7 +189,7 @@ for my $dbinfo ( @DBDs ) {
 
             $s->send( {%$_} ) foreach @test_data;
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -230,7 +230,7 @@ for my $dbinfo ( @DBDs ) {
 
             $s->send( {%$_} ) foreach @test_data;
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };

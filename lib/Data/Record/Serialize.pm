@@ -7,6 +7,8 @@ use 5.010000;
 use strict;
 use warnings;
 
+use warnings::register qw( Encode::dbi::queue );
+
 use Data::Record::Serialize::Error -all;
 
 our $VERSION = '0.14';
