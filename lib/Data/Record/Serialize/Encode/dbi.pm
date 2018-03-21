@@ -401,7 +401,7 @@ make sure to remove it from the queue:
 
   if ( ! eval { $output->flush } ) {
       warn "$@", Dumper( $@->payload );
-      pop $output->queue->@*;
+      shift $output->queue->@*;
   }
 
 As an example of completely flushing the queue while notifying of errors:
@@ -410,7 +410,7 @@ As an example of completely flushing the queue while notifying of errors:
 
   until ( eval { $output->flush } ) {
       warn "$@", Dumper( $@->payload );
-      pop $output->queue->@*;
+      shift $output->queue->@*;
   }
 
 =cut
@@ -508,7 +508,7 @@ As an example of draining the queue while notifying of errors:
 
   until ( eval { $output->close } ) {
       warn "$@", Dumper( $@->payload );
-      pop $output->queue->@*;
+      shift $output->queue->@*;
   }
 
 
