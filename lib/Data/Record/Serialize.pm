@@ -418,7 +418,7 @@ global destruction.
 
 =head2 B<output_fields>
 
-  $array_ref = $s->fields;
+  $array_ref = $s->output_fields;
 
 The names of the transformed output fields, in order of output (not
 obeyed by all encoders);
