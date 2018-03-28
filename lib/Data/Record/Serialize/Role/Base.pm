@@ -1,5 +1,9 @@
 package Data::Record::Serialize::Role::Base;
 
+=for Pod::Coverage *EVERYTHING*
+
+=cut
+
 use Moo::Role;
 
 our $VERSION = '0.15';
@@ -27,7 +31,6 @@ has default_type => (
     isa => Enum [qw( N I S )] | Undef,
 );
 
-# input field names;
 has fields => (
     is      => 'rwp',
     isa     => ArrayRef [Str] | Enum ['all'],
@@ -360,27 +363,3 @@ sub _set_types_from_default {
 
 
 1;
-
-__END__
-
-=begin pod_coverage
-
-=head3 BUILD
-
-=head3 default_type
-
-=head3 fields
-
-=head3 format
-
-=head3 format_fields
-
-=head3 format_types
-
-=head3 rename_fields
-
-=head3 types
-
-=head3 has_types
-
-=end pod_coverage
