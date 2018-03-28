@@ -28,7 +28,7 @@ around 'setup' => sub {
 
     # if fields has not been set yet, set it to the names in the data
     $self->_set_fields( [ keys %$data ] )
-      unless $self->fields;
+      unless $self->has_fields;
 
     if ( $self->_need_types ) {
 

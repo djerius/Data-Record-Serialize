@@ -31,6 +31,7 @@ has default_type => (
 has fields => (
     is      => 'rwp',
     isa     => ArrayRef [Str] | Enum ['all'],
+    predicate => 1,
     clearer => 1,
     trigger => sub {
         $_[0]->_clear_fieldh;
@@ -263,14 +264,14 @@ sub BUILD {
         if ( 'HASH' eq ref $types ) {
 
             $self->_set_fields( [ keys %{$types} ] )
-              if !defined $self->fields;
+             unless $self->has_fields;
         }
 
         elsif ( 'ARRAY' eq ref $types ) {
 
             $self->_set_types( { @{$types} } );
 
-            if ( !defined $self->fields ) {
+            if ( ! $self->has_fields ) {
 
                 my @fields;
                 push @fields, $types->[ 2 * $_ ] for 0 .. ( @{$types} / 2 ) - 1;
@@ -284,7 +285,7 @@ sub BUILD {
 
     }
 
-    if ( defined $self->fields ) {
+    if ( $self->has_fields ) {
 
         if ( ref $self->fields ) {
 
