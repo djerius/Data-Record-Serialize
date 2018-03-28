@@ -17,7 +17,7 @@ has types => (
     isa       => HashRef [ Enum [qw( N I S )] ] | CycleTuple[ Str, Enum[ qw( N I S ) ] ],
     predicate => 1,
     trigger   => sub {
-        $_[0]->clear_numeric_fields;
+        $_[0]->clear_type_index;
         $_[0]->clear_output_types;
     },
 );
@@ -106,18 +106,32 @@ has _numify => (
     default  => 0,
 );
 
-has numeric_fields => (
-    is      => 'lazy',
-    clearer => 1,
-    builder => sub {
-        my $self = shift;
 
-        return [
-            grep { $self->types->{$_} =~ /[IN]/i }
-              keys %{ $self->types } ];
+sub numeric_fields { return $_[0]->type_index->{'numeric'} }
 
-    },
+has type_index => (
+    is       => 'ro',
+    lazy     => 1,
     init_arg => undef,
+    clearer  => 1,
+    builder  => sub {
+        my $self  = shift;
+        my $types = $self->types;
+
+        my %index = map {
+            my ( $type, $re ) = @$_;
+            {
+                $type => [ grep { $types->{$_} =~ $re } keys %{$types} ]
+            }
+          }
+          [ S          => qr/S/i ],
+          [ N          => qr/N/i ],
+          [ I          => qr/I/i ],
+          [ numeric    => qr/[NI]/i ],
+          [ not_string => qr/^[^S]+$/ ];
+
+        return \%index;
+    },
 );
 
 has output_types => (
