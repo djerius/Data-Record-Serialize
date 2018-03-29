@@ -1,5 +1,21 @@
 {{$NEXT}}
 
+0.15      2018-03-28 15:00:21-04:00 America/New_York
+
+  [BEHAVIOR CHANGE]
+
+    * the dbi backend now translates empty numeric fields into
+      NULL fields.
+
+  [ENHANCEMENT]
+
+    * empty fields may now optionally be turned into NULL values.
+      see the <nullify> attribute.
+
+
+    * new method <type_index>, returns fields with a given type
+
+
 0.14      2018-03-21 13:03:45-04:00 America/New_York
 
   [API CHANGE]
