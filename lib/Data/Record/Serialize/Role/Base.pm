@@ -8,17 +8,21 @@ use Moo::Role;
 
 our $VERSION = '0.15';
 
-use Data::Record::Serialize::Error -all;
+use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
-use Types::Standard qw[ ArrayRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
+use Types::Standard
+  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
+
+use Ref::Util qw[ is_coderef is_arrayref ];
 
 use POSIX ();
 
 use namespace::clean;
 
 has types => (
-    is        => 'rwp',
-    isa       => HashRef [ Enum [qw( N I S )] ] | CycleTuple[ Str, Enum[ qw( N I S ) ] ],
+    is  => 'rwp',
+    isa => HashRef [ Enum [qw( N I S )] ]
+      | CycleTuple [ Str, Enum [qw( N I S )] ],
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -110,6 +114,123 @@ has _numify => (
 );
 
 
+=attr nullify
+
+  $obj->nullify( $array | $code | $bool );
+
+Specify which fields should be set to C<undef> if they are
+empty. Sinks should encode C<undef> as the C<null> value.  By default,
+no fields are nullified.
+
+B<nullify> may be passed:
+
+=over
+
+=item *  an array
+
+It should be a list of input field names.  These names are verified
+against the input fields after the first record is read.
+
+=item * a code ref
+
+The coderef is passed the object, and should return a list of input
+field names.  These names are verified against the input fields after
+the first record is read.
+
+=item * a boolean
+
+If true, all field names are added to the list. When false, the list
+is emptied.
+
+=back
+
+During verification, a
+C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
+if non-existent fields are specified.  Verification is I<not>
+performed until the next record is sent (or the L</nullified> method
+is called), so there is no immediate feedback.
+
+
+=cut
+
+
+has nullify => (
+    is        => 'rw',
+    isa       => ArrayRef [Str] | CodeRef | Bool,
+    predicate => 1,
+    trigger   => sub { $_[0]->_clear_nullify },
+);
+
+=method nullified
+
+  $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see L</nullify>).
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<nullified> may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=cut
+
+sub nullified {
+
+    my $self = shift;
+
+    return unless $self->has_fields;
+
+    return [ @ { $self->_nullify } ];
+}
+
+
+has _nullify => (
+    is       => 'rwp',
+    lazy     => 1,
+    isa      => ArrayRef [Str],
+    clearer  => 1,
+    predicate => 1,
+    init_arg => undef,
+    builder  => sub {
+
+        my $self = shift;
+
+        if ( $self->has_nullify ) {
+
+            my $nullify = $self->nullify;
+
+            if ( is_coderef( $nullify ) ) {
+
+                $nullify = (ArrayRef[Str])->assert_return( $nullify->( $self ) );
+            }
+
+            elsif ( is_arrayref( $nullify ) ) {
+                $nullify = [ @$nullify ];
+            }
+
+            else {
+                $nullify = [ $nullify ? @{$self->fields} : () ];
+            }
+
+            my $fieldh = $self->_fieldh;
+            my @not_field = grep { ! exists $fieldh->{$_} } @{ $nullify };
+            error( 'fields', "unknown nullify fields: ", join( ', ', @not_field ) )
+              if @not_field;
+
+            return $nullify;
+        }
+
+        # this allows encoder's to use a before or around modifier
+        # applied to _build__nullify to specify a default via
+        # $self->_set__nullify.
+        $self->_has_nullify ? $self->_nullify : [];
+    },
+);
+
+
 sub numeric_fields { return $_[0]->type_index->{'numeric'} }
 
 has type_index => (
@@ -136,6 +257,7 @@ has type_index => (
         return \%index;
     },
 );
+
 
 has output_types => (
     is       => 'lazy',

@@ -52,14 +52,23 @@ before 'send' => sub {
 
     my ( $self, $data ) = @_;
 
-
     # can't do format or numify until we have types, which might need to
     # be done from the data, which will be done in setup.
 
     $self->setup( $data )
       if $self->_run_setup;
 
+    # remove fields that won't be output
     delete @{$data}{ grep { !defined $self->_fieldh->{$_} } keys %{$data} };
+
+    # nullify fields (set to undef) those that are zero length
+
+    if ( defined ( my $nullify = $self->_nullify ) ) {
+
+        $data->{$_} = undef
+          for grep { defined $data->{$_} && ! length $data->{$_} }
+          @$nullify;
+    }
 
     if ( $self->_format ) {
 
@@ -68,7 +77,6 @@ before 'send' => sub {
         $data->{$_} = sprintf( $format->{$_}, $data->{$_} )
           foreach grep { defined $data->{$_} && length $data->{$_} }
           keys %{$format};
-
     }
 
     if ( $self->_numify ) {

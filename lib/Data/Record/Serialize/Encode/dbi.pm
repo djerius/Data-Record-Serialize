@@ -249,6 +249,13 @@ has '+_map_types' => (
     default => sub { {S => 'text', N => 'real', I => 'integer'} },
 );
 
+before '_build__nullify' => sub {
+
+    my $self = shift;
+    $self->_set__nullify( $self->type_index->{'numeric'} );
+
+};
+
 sub _table_exists {
 
     my $self = shift;
@@ -608,6 +615,10 @@ Field types are recognized and converted to SQL types via the following map:
   N => 'real'
   I => 'integer'
 
+=head2 NULL values
+
+By default numeric fields are set to C<NULL> if they are empty.  This
+can be changed by setting the C<nullify> attribute.
 
 =head2 Performance
 

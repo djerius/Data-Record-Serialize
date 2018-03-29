@@ -15,6 +15,7 @@ ok(
         $s = Data::Record::Serialize->new(
             encode => 'yaml',
             output => \$buf,
+            nullify => [ 'c' ],
           ),
           ;
     },
@@ -23,6 +24,7 @@ ok(
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2, } );
+$s->send( { a => 1, b => 2, c => '' } );
 
 ok ( ! $s->has_types, "no types were derived" );
 
@@ -40,6 +42,11 @@ is(
         {
             a => '1',
             b => '2',
+        },
+        {
+            a => '1',
+            b => '2',
+            c => undef,
         },
     ],
     'properly formatted'
