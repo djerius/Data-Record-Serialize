@@ -54,7 +54,7 @@ my @test_data = (
     { a => 9, b => 10 },
 );
 
-my @expected_data = map { my $obj = $_;
+my @expected_data = map { my $obj = { %$_ };
                           @{$obj}{ grep !defined $obj->{$_}, qw[ a b c ] } = undef;
                           $obj;
                       } @test_data;
