@@ -25,11 +25,8 @@ has '+_needs_eol' => (
 
 use namespace::clean;
 
-=begin pod_coverage
-
-=head3 setup
-
-=end pod_coverage
+=for Pod::Coverage
+  setup
 
 =cut
 
@@ -42,11 +39,8 @@ sub setup {
 
 }
 
-=begin pod_coverage
-
-=head3 encode
-
-=end pod_coverage
+=for Pod::Coverage
+ encode
 
 =cut
 
@@ -61,6 +55,7 @@ with 'Data::Record::Serialize::Role::Encode';
 
 1;
 
+# COPYRIGHT
 
 __END__
 
@@ -77,10 +72,10 @@ __END__
 B<Data::Record::Serialize::Encode::rdb> encodes a record as
 L<RDB|http://compbio.soe.ucsc.edu/rdb>.
 
-It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
+It performs the L<Data::Record::Serialize::Role::Encode> role.
 
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
+L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

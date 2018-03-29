@@ -13,11 +13,8 @@ use namespace::clean;
 has '+_need_types' => ( is => 'rwp', default => 0 );
 has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
-=begin pod_coverage
-
-=head3 encode
-
-=end pod_coverage
+=for Pod::Coverage
+ encode
 
 =cut
 
@@ -27,6 +24,8 @@ sub encode { shift; goto \&Dump; }
 with 'Data::Record::Serialize::Role::Encode';
 
 1;
+
+# COPYRIGHT
 
 __END__
 
@@ -42,10 +41,10 @@ __END__
 
 B<Data::Record::Serialize::Encode::yaml> encodes a record as YAML.
 
-It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
+It performs the L<Data::Record::Serialize::Role::Encode> role.
 
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

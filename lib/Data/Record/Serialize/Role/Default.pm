@@ -1,5 +1,7 @@
 package Data::Record::Serialize::Role::Default;
 
+# ABSTRACT:  Default methods for Data::Record::Serialize
+
 use Moo::Role;
 
 our $VERSION = '0.15';
@@ -8,6 +10,24 @@ use Hash::Util qw[ hv_store ];
 
 use namespace::clean;
 
+=for Pod::Coverage
+ cleanup
+ send
+ setup
+ DEMOLISH
+
+=cut
+
+=method B<send>
+
+  $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+B<WARNING>: the passed hash is modified.  If you need the original
+contents, pass in a copy.
+
+=cut
 
 # provide default if not already defined
 sub send {
@@ -111,17 +131,14 @@ sub DEMOLISH {
 
 1;
 
+# COPYRIGHT
+
 __END__
 
-=begin pod_coverage
 
-=head3 cleanup
+=head1 DESCRIPTION
 
-=head3 send
-
-=head3 setup
-
-=head3 DEMOLISH
-
-=end pod_coverage
+C<Data::Record::Serialize::Role::Default> provides default methods for
+L<Data::Record::Serialize>.  It is applied after all of the other roles to
+ensure that other roles' methods have priority.
 

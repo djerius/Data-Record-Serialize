@@ -8,6 +8,7 @@ requires "List::Util" => "1.29";
 requires "Moo::Role" => "2.003";
 requires "POSIX" => "0";
 requires "Package::Variant" => "0";
+requires "Ref::Util" => "0";
 requires "SQL::Translator" => "0";
 requires "SQL::Translator::Schema" => "0";
 requires "Type::Library" => "0";

@@ -19,11 +19,26 @@ use Package::Variant
 
 use namespace::clean;
 
-=begin pod_coverage
+=for Pod::Coverage make_variant
 
-=head3 make_variant
+=cut
 
-=end pod_coverage
+=attr C<encode>
+
+I<Required>. The encoding format.  Specific encoders may provide
+additional, or require specific, attributes. See L</Encoders>
+for more information.
+
+=attr C<sink>
+
+Where the encoded data will be sent.  Specific sinks may provide
+additional, or require specific attributes. See L</Sinks> for more
+information.
+
+The default output sink is C<stream>, unless the encoder is also a
+sink.
+
+It is an error to specify a sink if the encoder already acts as one.
 
 =cut
 
@@ -56,6 +71,16 @@ sub make_variant {
 
     with 'Data::Record::Serialize::Role::Default';
 }
+
+
+=method B<new>
+
+  $s = Data::Record::Serialize->new( <attributes> );
+
+Construct a new object. I<attributes> may either be a hashref or a
+list of key-value pairs. See L</ATTRIBUTES> for more information.
+
+=cut
 
 
 sub new {
@@ -163,20 +188,20 @@ The available encoders and their respective documentation are:
 
 =item *
 
-C<dbi> - L<B<Data::Record::Serialize::Encode::dbi>>
+C<dbi> - L<Data::Record::Serialize::Encode::dbi>
 
 Write to a database via B<DBI>. This is a combined
 encoder and sink.
 
 =item *
 
-C<ddump> - L<B<Data::Record::Serialize::Encode::ddump>>
+C<ddump> - L<Data::Record::Serialize::Encode::ddump>
 
-encode via L<B<Data::Dumper>>
+encode via L<Data::Dumper>
 
 =item *
 
-C<json> - L<B<Data::Record::Serialize::Encode::json>>
+C<json> - L<Data::Record::Serialize::Encode::json>
 
 =item *
 
@@ -185,14 +210,13 @@ encoder and sink.
 
 =item *
 
-C<rdb>  - L<B<Data::Record::Serialize::Encode::rdb>>
+C<rdb>  - L<Data::Record::Serialize::Encode::rdb>
 
 =item *
 
-C<yaml> - L<B<Data::Record::Serialize::Encode::yaml>>
+C<yaml> - L<Data::Record::Serialize::Encode::yaml>
 
 =back
-
 
 =head2 Sinks
 
@@ -204,14 +228,13 @@ The available sinks and their documentation are:
 
 =item *
 
-C<stream> - L<B<Data::Record::Serialize::Sink::stream>>
+C<stream> - L<Data::Record::Serialize::Sink::stream>
 
 =item *
 
 C<null> - send the encoded data to the bit bucket.
 
 =back
-
 
 =head2 Types
 
@@ -284,160 +307,10 @@ record send to the output stream.
                              Types are specified by <types>.
 
 
-=head1 INTERFACE
-
 =head2 Errors
 
 Most errors result in exception objects being thrown, typically in the
 L<Data::Record::Serialize::Error> hierarchy.
-
-=head2 B<new>
-
-  $s = Data::Record::Serialize->new( <attributes> );
-
-Construct a new object. I<attributes> may either be a hashref or a
-list of key-value pairs.
-
-The available attributes are:
-
-=over
-
-=item C<encode>
-
-I<Required>. The encoding format.  Specific encoders may provide
-additional, or require specific, attributes. See L</Encoders>
-for more information.
-
-=item C<sink>
-
-Where the encoded data will be sent.  Specific sinks may provide
-additional, or require specific attributes. See L</Sinks> for more
-information.
-
-The default output sink is C<stream>, unless the encoder is also a
-sink.
-
-It is an error to specify a sink if the encoder already acts as one.
-
-=item C<default_type>=I<type>
-
-If set, output fields whose types were not
-specified via the C<types> attribute will be assigned this type.
-To understand how this attribute works in concert with L</fields> and
-L</types>, please see L</Fields and their types>.
-
-=item C<types>
-
-A hash or array mapping input field names to types (C<N>, C<I>,
-C<S>).  If an array, the fields will be output in the specified
-order, provided the encoder permits it (see below, however).  For example,
-
-  # use order if possible
-  types => [ c => 'N', a => 'N', b => 'N' ]
-
-  # order doesn't matter
-  types => { c => 'N', a => 'N', b => 'N' }
-
-If C<fields> is specified, then its order will override that specified
-here.
-
-To understand how this attribute works in concert with L</fields> and
-L</default_type>, please see L</Fields and their types>.
-
-
-=item C<fields>
-
-Which fields to output.  It may be one of:
-
-=over
-
-=item *
-
-An array containing the input names of the fields to be output. The
-fields will be output in the specified order, provided the encoder
-permits it.
-
-=item *
-
-The string C<all>, indicating that all input fields will be output.
-
-=item *
-
-Unspecified or undefined.
-
-=back
-
-To understand how this attribute works in concert with L</types> and
-L</default_type>, please see L</Fields and their types>.
-
-
-=item C<rename_fields>
-
-A hash mapping input to output field names.  By default the input
-field names are used unaltered.
-
-=item C<format_fields>
-
-A hash mapping the input field names to a C<sprintf> style
-format. This will be applied prior to encoding the record, but only if
-the C<format> attribute is also set.  Formats specified here override
-those specified in C<format_types>.
-
-=item C<format_types>
-
-A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format.  This will be applied prior to encoding the record, but only
-if the C<format> attribute is also set.  Formats specified here may be
-overridden for specific fields using the C<format_fields> attribute.
-
-=item C<format>
-
-If true, format the output fields using the formats specified in the
-C<format_fields> and/or C<format_types> options.  The default is false.
-
-=back
-
-=head2 B<send>
-
-  $s->send( \%record );
-
-Encode and send the record to the associated sink.
-
-B<WARNING>: the passed hash is modified.  If you need the original
-contents, pass in a copy.
-
-
-=head2 B<close>
-
-  $s->close;
-
-Flush any data written to the sink and close it.  While this will be
-performed automatically when the object is destroyed, if the object is
-not destroyed prior to global destruction at the end of the program,
-it is quite possible that it will not be possible to perform this
-cleanly.  In other words, make sure that sinks are closed prior to
-global destruction.
-
-=head2 B<output_fields>
-
-  $array_ref = $s->output_fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-=head2 B<output_types>
-
-  $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
-
-=head2 B<numeric_fields>
-
-  $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
 
 =head1 EXAMPLES
 
@@ -508,6 +381,201 @@ The input field names for those fields deemed to be numeric.
 
 =head1 SEE ALSO
 
-Other modules:
+L<Data::Serializer>
 
-L<B<Data::Serializer>>
+=attr C<types>
+
+A hash or array mapping input field names to types (C<N>, C<I>,
+C<S>).  If an array, the fields will be output in the specified
+order, provided the encoder permits it (see below, however).  For example,
+
+  # use order if possible
+  types => [ c => 'N', a => 'N', b => 'N' ]
+
+  # order doesn't matter
+  types => { c => 'N', a => 'N', b => 'N' }
+
+If C<fields> is specified, then its order will override that specified
+here.
+
+To understand how this attribute works in concert with L</fields> and
+L</default_type>, please see L</Fields and their types>.
+
+=method has_types
+
+returns true if L</types> has been set.
+
+=attr C<default_type> I<type>
+
+If set, output fields whose types were not
+specified via the C<types> attribute will be assigned this type.
+To understand how this attribute works in concert with L</fields> and
+L</types>, please see L</Fields and their types>.
+
+=attr C<fields>
+
+Which fields to output.  It may be one of:
+
+=over
+
+=item *
+
+An array containing the input names of the fields to be output. The
+fields will be output in the specified order, provided the encoder
+permits it.
+
+=item *
+
+The string C<all>, indicating that all input fields will be output.
+
+=item *
+
+Unspecified or undefined.
+
+=back
+
+To understand how this attribute works in concert with L</types> and
+L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+
+=method has_fields
+
+returns true if L</fields> has been set.
+
+=method B<output_fields>
+
+  $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+=attr nullify
+
+  $obj->nullify( $array | $code | $bool );
+
+Specify which fields should be set to C<undef> if they are
+empty. Sinks should encode C<undef> as the C<null> value.  By default,
+no fields are nullified.
+
+B<nullify> may be passed:
+
+=over
+
+=item *  an array
+
+It should be a list of input field names.  These names are verified
+against the input fields after the first record is read.
+
+=item * a code ref
+
+The coderef is passed the object, and should return a list of input
+field names.  These names are verified against the input fields after
+the first record is read.
+
+=item * a boolean
+
+If true, all field names are added to the list. When false, the list
+is emptied.
+
+=back
+
+During verification, a
+C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
+if non-existent fields are specified.  Verification is I<not>
+performed until the next record is sent (or the L</nullified> method
+is called), so there is no immediate feedback.
+
+=method has_nullify
+
+returns true if L</nullify> has been set.
+
+=method nullified
+
+  $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see L</nullify>).
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<nullified> may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=method B<numeric_fields>
+
+  $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+=method B<type_index>
+
+  $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  I<Don't edit this!>.
+
+The hash keys are:
+
+=over
+
+=item C<I>
+
+=item C<N>
+
+=item C<S>
+
+=item C<numeric>
+
+C<N> and C<I>.
+
+=item C<not_string>
+
+Everything but C<S>.
+
+=back
+
+=method B<output_types>
+
+  $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+=attr C<format_fields>
+
+A hash mapping the input field names to a C<sprintf> style
+format. This will be applied prior to encoding the record, but only if
+the C<format> attribute is also set.  Formats specified here override
+those specified in C<format_types>.
+
+=attr C<format_types>
+
+A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
+format.  This will be applied prior to encoding the record, but only
+if the C<format> attribute is also set.  Formats specified here may be
+overridden for specific fields using the C<format_fields> attribute.
+
+=attr C<rename_fields>
+
+A hash mapping input to output field names.  By default the input
+field names are used unaltered.
+
+=attr C<format>
+
+If true, format the output fields using the formats specified in the
+C<format_fields> and/or C<format_types> options.  The default is false.
+
+=for Pod::Coverage
+  BUILD
+
+
+=method B<send>
+
+  $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+B<WARNING>: the passed hash is modified.  If you need the original
+contents, pass in a copy.

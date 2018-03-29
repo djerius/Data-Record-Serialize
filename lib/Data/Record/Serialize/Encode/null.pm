@@ -10,19 +10,12 @@ use namespace::clean;
 
 has '+_need_types' => ( is => 'rwp', default => 0 );
 
-=begin pod_coverage
-
-=head3 encode
-
-=head3 send
-
-=head3 print
-
-=head3 say
-
-=head3 close
-
-=end pod_coverage
+=for Pod::Coverage
+ encode
+ send
+ print
+ say
+ close
 
 =cut
 
@@ -36,6 +29,8 @@ with 'Data::Record::Serialize::Role::Encode';
 with 'Data::Record::Serialize::Role::Sink';
 
 1;
+
+# COPYRIGHT
 
 __END__
 
@@ -52,10 +47,10 @@ __END__
 B<Data::Record::Serialize::Encode::null> is both an encoder and a sink.
 All records sent using it will disappear.
 
-It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
-L<B<Data::Record::Serialize::Role::Sink>> roles.
+It performs both the L<Data::Record::Serialize::Role::Encode> and
+L<Data::Record::Serialize::Role::Sink> roles.
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<B<Data::Record::Serialize::new>|Data::Record::Serialize/new>.
+L<Data::Record::Serialize::new>|Data::Record::Serialize/new>.

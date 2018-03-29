@@ -8,15 +8,10 @@ use namespace::clean;
 
 our $VERSION = '0.15';
 
-=begin pod_coverage
-
-=head3 print
-
-=head3 say
-
-=head3 close
-
-=end pod_coverage
+=for Pod::Coverage
+ print
+ say
+ close
 
 =cut
 
@@ -28,6 +23,8 @@ sub close { }
 with 'Data::Record::Serialize::Role::Sink';
 
 1;
+
+# COPYRIGHT
 
 __END__
 
@@ -43,4 +40,4 @@ __END__
 
 B<Data::Record::Serialize::Sink::stream> sends data to the bitbucket.
 
-It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
+It performs the L<Data::Record::Serialize::Role::Sink> role.

@@ -85,11 +85,7 @@ has table => (
 
 The schema to which the table belongs.  Optional.
 
-=begin pod_coverage
-
-=head3 has_schema
-
-=end pod_coverage
+=for  Pod::Coverage has_schema
 
 =cut
 
@@ -216,7 +212,7 @@ has batch => (
 
 =attr C<dbitrace>
 
-A trace setting passed to  L<B<DBI>>.
+A trace setting passed to  L<DBI>.
 
 =cut
 
@@ -272,11 +268,7 @@ sub _fq_table_name {
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
-=begin pod_coverage
-
-=head3  setup
-
-=end pod_coverage
+=for Pod::Coverage setup
 
 =cut
 
@@ -562,15 +554,10 @@ sub DEMOLISH {
 # these are required by the Sink/Encode interfaces but should never be
 # called in the ordinary run of things.
 
-=begin pod_coverage
-
-=head3 say
-
-=head3 print
-
-=head3 encode
-
-=end pod_coverage
+=for  Pod::Coverage
+  say
+  print
+  encode
 
 =cut
 
@@ -585,6 +572,7 @@ with 'Data::Record::Serialize::Role::Encode';
 
 1;
 
+# COPYRIGHT
 
 __END__
 
@@ -599,10 +587,10 @@ __END__
 =head1 DESCRIPTION
 
 B<Data::Record::Serialize::Encode::dbi> writes a record to a database using
-L<B<DBI>>.
+L<DBI>.
 
-It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
-L<B<Data::Record::Serialize::Role::Sink>> roles.
+It performs both the L<Data::Record::Serialize::Role::Encode> and
+L<Data::Record::Serialize::Role::Sink> roles.
 
 B<You cannot construct this directly>. You must use
 L<Data::Record::Serialize/new>.
@@ -637,4 +625,4 @@ objects.
 =head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
-defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

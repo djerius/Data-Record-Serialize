@@ -1,8 +1,6 @@
 package Data::Record::Serialize::Role::Base;
 
-=for Pod::Coverage *EVERYTHING*
-
-=cut
+# ABSTRACT: Base Role for Data::Record::Serialize
 
 use Moo::Role;
 
@@ -19,6 +17,30 @@ use POSIX ();
 
 use namespace::clean;
 
+=attr C<types>
+
+A hash or array mapping input field names to types (C<N>, C<I>,
+C<S>).  If an array, the fields will be output in the specified
+order, provided the encoder permits it (see below, however).  For example,
+
+  # use order if possible
+  types => [ c => 'N', a => 'N', b => 'N' ]
+
+  # order doesn't matter
+  types => { c => 'N', a => 'N', b => 'N' }
+
+If C<fields> is specified, then its order will override that specified
+here.
+
+To understand how this attribute works in concert with L</fields> and
+L</default_type>, please see L</Fields and their types>.
+
+=method has_types
+
+returns true if L</types> has been set.
+
+=cut
+
 has types => (
     is  => 'rwp',
     isa => HashRef [ Enum [qw( N I S )] ]
@@ -30,10 +52,50 @@ has types => (
     },
 );
 
+=attr C<default_type> I<type>
+
+If set, output fields whose types were not
+specified via the C<types> attribute will be assigned this type.
+To understand how this attribute works in concert with L</fields> and
+L</types>, please see L</Fields and their types>.
+
+=cut
+
 has default_type => (
     is  => 'ro',
     isa => Enum [qw( N I S )] | Undef,
 );
+
+=attr C<fields>
+
+Which fields to output.  It may be one of:
+
+=over
+
+=item *
+
+An array containing the input names of the fields to be output. The
+fields will be output in the specified order, provided the encoder
+permits it.
+
+=item *
+
+The string C<all>, indicating that all input fields will be output.
+
+=item *
+
+Unspecified or undefined.
+
+=back
+
+To understand how this attribute works in concert with L</types> and
+L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+
+=method has_fields
+
+returns true if L</fields> has been set.
+
+=cut
 
 has fields => (
     is      => 'rwp',
@@ -62,7 +124,15 @@ has _fieldh => (
 );
 
 
-# output field names
+=method B<output_fields>
+
+  $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+=cut
+
 has output_fields => (
     is      => 'lazy',
     trigger => 1,
@@ -150,6 +220,9 @@ if non-existent fields are specified.  Verification is I<not>
 performed until the next record is sent (or the L</nullified> method
 is called), so there is no immediate feedback.
 
+=method has_nullify
+
+returns true if L</nullify> has been set.
 
 =cut
 
@@ -231,7 +304,44 @@ has _nullify => (
 );
 
 
+=method B<numeric_fields>
+
+  $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+=cut
+
 sub numeric_fields { return $_[0]->type_index->{'numeric'} }
+
+=method B<type_index>
+
+  $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  I<Don't edit this!>.
+
+The hash keys are:
+
+=over
+
+=item C<I>
+
+=item C<N>
+
+=item C<S>
+
+=item C<numeric>
+
+C<N> and C<I>.
+
+=item C<not_string>
+
+Everything but C<S>.
+
+=back
+
+=cut
 
 has type_index => (
     is       => 'ro',
@@ -258,6 +368,15 @@ has type_index => (
     },
 );
 
+=method B<output_types>
+
+  $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+=cut
 
 has output_types => (
     is       => 'lazy',
@@ -304,10 +423,28 @@ has _map_types => (
     predicate => 1,
 );
 
+=attr C<format_fields>
+
+A hash mapping the input field names to a C<sprintf> style
+format. This will be applied prior to encoding the record, but only if
+the C<format> attribute is also set.  Formats specified here override
+those specified in C<format_types>.
+
+=cut
+
 has format_fields => (
     is  => 'ro',
     isa => HashRef [Str],
 );
+
+=attr C<format_types>
+
+A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
+format.  This will be applied prior to encoding the record, but only
+if the C<format> attribute is also set.  Formats specified here may be
+overridden for specific fields using the C<format_fields> attribute.
+
+=cut
 
 has format_types => (
     is  => 'ro',
@@ -316,6 +453,13 @@ has format_types => (
     trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
 );
 
+
+=attr C<rename_fields>
+
+A hash mapping input to output field names.  By default the input
+field names are used unaltered.
+
+=cut
 
 has rename_fields => (
     is     => 'ro',
@@ -334,6 +478,13 @@ has rename_fields => (
     },
 );
 
+
+=attr C<format>
+
+If true, format the output fields using the formats specified in the
+C<format_fields> and/or C<format_types> options.  The default is false.
+
+=cut
 
 has format => (
     is      => 'ro',
@@ -389,6 +540,11 @@ has _format => (
     },
     init_arg => undef,
 );
+
+=for Pod::Coverage
+  BUILD
+
+=cut
 
 sub BUILD {
 
@@ -485,3 +641,12 @@ sub _set_types_from_default {
 
 
 1;
+
+# COPYRIGHT
+
+=head1 DESCRIPTION
+
+C<Data::Record::Serialize::Role::Base> is the base role for
+L<Data::Record::Serialize>.  It serves the place of a base class, except
+as a role there is no overhead during method lookup
+

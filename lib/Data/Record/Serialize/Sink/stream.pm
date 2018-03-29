@@ -33,15 +33,10 @@ has fh => (
 
 );
 
-=begin pod_coverage
-
-=head3 print
-
-=head3 say
-
-=head3 close
-
-=end pod_coverage
+=for Pod::Coverage
+ print
+ say
+ close
 
 =cut
 
@@ -52,6 +47,8 @@ sub close { shift->fh->close }
 with 'Data::Record::Serialize::Role::Sink';
 
 1;
+
+# COPYRIGHT
 
 __END__
 
@@ -68,13 +65,13 @@ __END__
 B<Data::Record::Serialize::Sink::stream> outputs encoded data to a
 file handle.
 
-It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
+It performs the L<Data::Record::Serialize::Role::Sink> role.
 
 
 =head1 INTERFACE
 
 The following attributes may be passed to
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
+L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
 
 =over
 

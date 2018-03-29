@@ -12,6 +12,8 @@ requires 'encode';
 
 1;
 
+# COPYRIGHT
+
 __END__
 
 =head1 DESCRIPTION
