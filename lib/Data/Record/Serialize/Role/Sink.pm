@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 requires 'print';
 requires 'say';
