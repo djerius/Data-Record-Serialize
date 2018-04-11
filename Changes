@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.18      2018-04-11 15:01:27-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * Need Moo >= 2.003001 to get fix to RT#120000
+
 0.17      2018-04-11 15:01:27-04:00 America/New_York
 
   [BUG FIX]
