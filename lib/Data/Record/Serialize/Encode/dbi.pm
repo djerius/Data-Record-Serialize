@@ -12,7 +12,7 @@ use Data::Record::Serialize::Error { errors =>
         insert
    )] }, -all;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Data::Record::Serialize::Types -types;
 

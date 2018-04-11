@@ -11,7 +11,7 @@ use warnings::register qw( Encode::dbi::queue );
 
 use Data::Record::Serialize::Error -all;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Package::Variant
   importing => ['Moo'],
