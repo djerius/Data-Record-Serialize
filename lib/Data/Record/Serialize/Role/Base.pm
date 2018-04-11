@@ -4,7 +4,7 @@ package Data::Record::Serialize::Role::Base;
 
 use Moo::Role;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
 
