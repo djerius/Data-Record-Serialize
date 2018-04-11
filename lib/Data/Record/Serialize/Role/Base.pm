@@ -43,8 +43,7 @@ returns true if L</types> has been set.
 
 has types => (
     is  => 'rwp',
-    isa => HashRef [ Enum [qw( N I S )] ]
-      | CycleTuple [ Str, Enum [qw( N I S )] ],
+    isa => ( HashRef [ Enum [qw( N I S )] ] | CycleTuple [ Str, Enum [qw( N I S )] ] ),   # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -99,7 +98,7 @@ returns true if L</fields> has been set.
 
 has fields => (
     is      => 'rwp',
-    isa     => ArrayRef [Str] | Enum ['all'],
+    isa     => ( ArrayRef [Str] | Enum ['all'] ),  # need parens for perl <= 5.12.5
     predicate => 1,
     clearer => 1,
     trigger => sub {
@@ -229,7 +228,7 @@ returns true if L</nullify> has been set.
 
 has nullify => (
     is        => 'rw',
-    isa       => ArrayRef [Str] | CodeRef | Bool,
+    isa       => ( ArrayRef [Str] | CodeRef | Bool ),  # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub { $_[0]->_clear_nullify },
 );
