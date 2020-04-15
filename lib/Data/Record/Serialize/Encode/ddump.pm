@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::ddump;
 
 use Moo::Role;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Data::Dumper;
 

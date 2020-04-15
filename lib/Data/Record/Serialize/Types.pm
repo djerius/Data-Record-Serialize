@@ -5,7 +5,7 @@ package Data::Record::Serialize::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Type::Utils -all;
 use Types::Standard -types;
