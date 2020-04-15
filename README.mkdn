@@ -327,17 +327,24 @@ is called), so there is no immediate feedback.
 
 ## `format_fields`
 
-A hash mapping the input field names to a `sprintf` style
-format. This will be applied prior to encoding the record, but only if
-the `format` attribute is also set.  Formats specified here override
-those specified in `format_types`.
+A hash mapping the input field names to either a `sprintf` style
+format or a coderef. This will be applied prior to encoding the
+record, but only if the `format` attribute is also set.  Formats
+specified here override those specified in `format_types`.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 ## `format_types`
 
 A hash mapping a field type (`N`, `I`, `S`) to a `sprintf` style
-format.  This will be applied prior to encoding the record, but only
-if the `format` attribute is also set.  Formats specified here may be
-overridden for specific fields using the `format_fields` attribute.
+format or a coderef.  This will be applied prior to encoding the
+record, but only if the `format` attribute is also set.  Formats
+specified here may be overridden for specific fields using the
+`format_fields` attribute.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 ## `rename_fields`
 
@@ -414,10 +421,21 @@ If true, format the output fields using the formats specified in the
       types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
      );
 
-# BUGS AND LIMITATIONS
+# SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at [https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize](https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize).
+## Bugs
+
+Please report any bugs or feature requests to bug-data-record-serialize@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Record-Serialize
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/data-record-serialize
+
+and may be cloned from
+
+    https://gitlab.com/djerius/data-record-serialize.git
 
 # SEE ALSO
 
