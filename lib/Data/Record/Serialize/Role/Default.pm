@@ -7,6 +7,7 @@ use Moo::Role;
 our $VERSION = '0.19';
 
 use Hash::Util qw[ hv_store ];
+use Ref::Util qw[ is_coderef ];
 
 use namespace::clean;
 
@@ -83,18 +84,20 @@ before 'send' => sub {
 
     # nullify fields (set to undef) those that are zero length
 
-    if ( defined ( my $nullify = $self->_nullify ) ) {
+    if ( defined( my $nullify = $self->_nullify ) ) {
 
         $data->{$_} = undef
-          for grep { defined $data->{$_} && ! length $data->{$_} }
-          @$nullify;
+          for grep { defined $data->{$_} && !length $data->{$_} } @$nullify;
     }
 
     if ( $self->_format ) {
 
         my $format = $self->_format;
 
-        $data->{$_} = sprintf( $format->{$_}, $data->{$_} )
+        $data->{$_}
+          = is_coderef( $format->{$_} )
+          ? $format->{$_}( $data->{$_} )
+          : sprintf( $format->{$_}, $data->{$_} )
           foreach grep { defined $data->{$_} && length $data->{$_} }
           keys %{$format};
     }

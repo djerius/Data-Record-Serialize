@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+  [ENHANCEMENTS]
+
+    * formats may now be coderef's as well as sprintf format strings
+
+
 0.18      2018-04-11 15:01:27-04:00 America/New_York
 
   [BUILD FIX]

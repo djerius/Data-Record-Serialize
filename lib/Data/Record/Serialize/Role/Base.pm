@@ -424,30 +424,37 @@ has _map_types => (
 
 =attr C<format_fields>
 
-A hash mapping the input field names to a C<sprintf> style
-format. This will be applied prior to encoding the record, but only if
-the C<format> attribute is also set.  Formats specified here override
-those specified in C<format_types>.
+A hash mapping the input field names to either a C<sprintf> style
+format or a coderef. This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here override those specified in C<format_types>.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 =cut
 
 has format_fields => (
     is  => 'ro',
-    isa => HashRef [Str],
+    isa => HashRef [Str | CodeRef],
 );
 
 =attr C<format_types>
 
 A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format.  This will be applied prior to encoding the record, but only
-if the C<format> attribute is also set.  Formats specified here may be
-overridden for specific fields using the C<format_fields> attribute.
+format or a coderef.  This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here may be overridden for specific fields using the
+C<format_fields> attribute.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
 
 =cut
 
 has format_types => (
     is  => 'ro',
-    isa => HashRef [Str],
+    isa => HashRef [Str | CodeRef],
     # we'll need to gather types
     trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
 );
