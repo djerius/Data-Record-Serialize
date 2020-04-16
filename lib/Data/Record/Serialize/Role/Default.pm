@@ -9,6 +9,8 @@ our $VERSION = '0.20';
 use Hash::Util qw[ hv_store ];
 use Ref::Util qw[ is_coderef ];
 
+use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
+
 use namespace::clean;
 
 =for Pod::Coverage
@@ -50,6 +52,10 @@ around 'setup' => sub {
     # if fields has not been set yet, set it to the names in the data
     $self->_set_fields( [ keys %$data ] )
       unless $self->has_fields;
+
+    # make sure there are no duplicate output fields
+    my %dups;
+    $dups{$_}++ && error( fields => "duplicate output field: $_" ) for@{$self->fields};
 
     if ( $self->_need_types ) {
 
