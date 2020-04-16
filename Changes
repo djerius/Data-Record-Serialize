@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.20      2020-04-15 11:17:27-04:00 America/New_York
+
+  [BUG FIX]
+
+    * duplicate output fields now cause an exception to be thrown
+
 0.19      2020-04-15 11:17:27-04:00 America/New_York
 
   [ENHANCEMENTS]
