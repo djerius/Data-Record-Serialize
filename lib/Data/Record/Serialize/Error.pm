@@ -114,7 +114,7 @@ L<failures/Attributes>.
 
 This module organizes L<Data::Record::Serialize> errors based upon
 L<custom::failures>.  It uses L<Exporter::Shiny>. The global option
-nnC<errors> may be used to construct a set of error classes.  C<errors>
+C<errors> may be used to construct a set of error classes.  C<errors>
 is passed an array of error names; if they begin with C<::> they are
 relative to C<Data::Record::Serialize::Error>, otherwise they are
 relative to the C<Error> sub-hierarchy under the calling package.

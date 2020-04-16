@@ -185,8 +185,6 @@ has _numify => (
 
 =attr nullify
 
-  $obj->nullify( $array | $code | $bool );
-
 Specify which fields should be set to C<undef> if they are
 empty. Sinks should encode C<undef> as the C<null> value.  By default,
 no fields are nullified.

@@ -295,8 +295,6 @@ To understand how this attribute works in concert with ["types"](#types) and
 
 ## nullify
 
-    $obj->nullify( $array | $code | $bool );
-
 Specify which fields should be set to `undef` if they are
 empty. Sinks should encode `undef` as the `null` value.  By default,
 no fields are nullified.
