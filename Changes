@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+  [BUILD]
+
+    * switch to Module::Build::Tiny
+    * Require Type::Tiny >= 1.010003 to fix broken CPAN tests: ++srezic (RT#131939)
+
+
 0.20      2020-04-15 11:17:27-04:00 America/New_York
 
   [BUG FIX]
