@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 has '+_need_types' => (
     is      => 'rwp',
