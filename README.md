@@ -151,91 +151,6 @@ record send to the output stream.
 Most errors result in exception objects being thrown, typically in the
 [Data::Record::Serialize::Error](https://metacpan.org/pod/Data::Record::Serialize::Error) hierarchy.
 
-# METHODS
-
-## **new**
-
-    $s = Data::Record::Serialize->new( <attributes> );
-
-Construct a new object. _attributes_ may either be a hashref or a
-list of key-value pairs. See ["ATTRIBUTES"](#attributes) for more information.
-
-## has\_types
-
-returns true if ["types"](#types) has been set.
-
-## has\_fields
-
-returns true if ["fields"](#fields) has been set.
-
-## **output\_fields**
-
-    $array_ref = $s->output_fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-## has\_nullify
-
-returns true if ["nullify"](#nullify) has been set.
-
-## nullified
-
-    $fields = $obj->nullified;
-
-Returns a list of fields which are checked for empty values (see ["nullify"](#nullify)).
-
-This will return `undef` if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
-
-If the list of fields is available, calling **nullified** may result in
-verification of the list of nullified fields against the list of
-actual fields.  A disparity will result in an exception of class
-`Data::Record::Serialize::Error::Role::Base::fields`.
-
-## **numeric\_fields**
-
-    $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
-
-## **type\_index**
-
-    $hash = $s->type_index;
-
-A hash, keyed off of field type or category.  The values are
-an array of field names.  _Don't edit this!_.
-
-The hash keys are:
-
-- `I`
-- `N`
-- `S`
-- `numeric`
-
-    `N` and `I`.
-
-- `not_string`
-
-    Everything but `S`.
-
-## **output\_types**
-
-    $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
-
-## **send**
-
-    $s->send( \%record );
-
-Encode and send the record to the associated sink.
-
-**WARNING**: the passed hash is modified.  If you need the original
-contents, pass in a copy.
-
 # ATTRIBUTES
 
 ## `encode`
@@ -353,6 +268,91 @@ field names are used unaltered.
 
 If true, format the output fields using the formats specified in the
 `format_fields` and/or `format_types` options.  The default is false.
+
+# METHODS
+
+## **new**
+
+    $s = Data::Record::Serialize->new( <attributes> );
+
+Construct a new object. _attributes_ may either be a hashref or a
+list of key-value pairs. See ["ATTRIBUTES"](#attributes) for more information.
+
+## has\_types
+
+returns true if ["types"](#types) has been set.
+
+## has\_fields
+
+returns true if ["fields"](#fields) has been set.
+
+## **output\_fields**
+
+    $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+## has\_nullify
+
+returns true if ["nullify"](#nullify) has been set.
+
+## nullified
+
+    $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see ["nullify"](#nullify)).
+
+This will return `undef` if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling **nullified** may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+`Data::Record::Serialize::Error::Role::Base::fields`.
+
+## **numeric\_fields**
+
+    $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+## **type\_index**
+
+    $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  _Don't edit this!_.
+
+The hash keys are:
+
+- `I`
+- `N`
+- `S`
+- `numeric`
+
+    `N` and `I`.
+
+- `not_string`
+
+    Everything but `S`.
+
+## **output\_types**
+
+    $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+## **send**
+
+    $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+**WARNING**: the passed hash is modified.  If you need the original
+contents, pass in a copy.
 
 # EXAMPLES
 
