@@ -17,20 +17,15 @@ has output => (
     is      => 'ro',
 );
 
-
 has fh => (
-
     is => 'lazy',
-
     builder => sub {
         my $self = shift;
-
         return ( ! defined $self->output || $self->output eq '-' )
           ? \*STDOUT
           : ( IO::File->new( $self->output, 'w' )
               or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
-
 );
 
 =for Pod::Coverage

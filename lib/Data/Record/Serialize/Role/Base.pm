@@ -265,22 +265,17 @@ has _nullify => (
     predicate => 1,
     init_arg => undef,
     builder  => sub {
-
         my $self = shift;
 
         if ( $self->has_nullify ) {
-
             my $nullify = $self->nullify;
 
             if ( is_coderef( $nullify ) ) {
-
                 $nullify = (ArrayRef[Str])->assert_return( $nullify->( $self ) );
             }
-
             elsif ( is_arrayref( $nullify ) ) {
                 $nullify = [ @$nullify ];
             }
-
             else {
                 $nullify = [ $nullify ? @{$self->fields} : () ];
             }
@@ -382,7 +377,6 @@ has output_types => (
     trigger  => 1,
     builder  => sub {
         my $self = shift;
-
         my %types;
 
         return unless $self->has_types;
@@ -395,13 +389,10 @@ has output_types => (
         }
 
         if ( $self->_has_map_types ) {
-
             $types{$_} = $self->_map_types->{ $types{$_} } foreach keys %types;
-
         }
 
         for my $key ( keys %types ) {
-
             my $rename = $self->rename_fields->{$key}
               or next;
 
@@ -500,12 +491,9 @@ has _format => (
     is      => 'rwp',
     lazy    => 1,
     default => sub {
-
         my $self = shift;
 
-
         if ( $self->format ) {
-
             my %format;
 
             # first consider types; they'll be overridden by per field
@@ -525,15 +513,12 @@ has _format => (
             }
 
             if ( $self->format_fields ) {
-
                 for my $field ( @{ $self->fields } ) {
-
                     my $format = $self->format_fields->{$field}
                       or next;
 
                     $format{$field} = $format;
                 }
-
             }
 
             return \%format
@@ -551,41 +536,32 @@ has _format => (
 =cut
 
 sub BUILD {
-
     my $self = shift;
 
     # if types is passed, set fields if it's not set.
     # convert types to hash if it's an array
-
     my $types;
     if ( defined( $types = $self->types ) ) {
 
         if ( 'HASH' eq ref $types ) {
-
             $self->_set_fields( [ keys %{$types} ] )
              unless $self->has_fields;
         }
-
         elsif ( 'ARRAY' eq ref $types ) {
-
             $self->_set_types( { @{$types} } );
 
             if ( ! $self->has_fields ) {
-
                 my @fields;
                 push @fields, $types->[ 2 * $_ ] for 0 .. ( @{$types} / 2 ) - 1;
-
                 $self->_set_fields( \@fields );
             }
         }
         else {
             error( '::attribute::value', "internal error" );
         }
-
     }
 
     if ( $self->has_fields ) {
-
         if ( ref $self->fields ) {
 
             # in this specific case everything can be done before the first
@@ -610,13 +586,11 @@ sub BUILD {
 }
 
 sub _set_types_from_record {
-
     my ( $self, $data ) = @_;
 
     my $types = $self->has_types ? $self->types : {};
 
     for my $field ( grep !defined $types->{$_}, @{ $self->fields } ) {
-
         my $value = $data->{$field};
         my $def = Scalar::Util::looks_like_number( $value ) ? 'N' : 'S';
 
@@ -632,7 +606,6 @@ sub _set_types_from_record {
 }
 
 sub _set_types_from_default {
-
     my $self = shift;
 
     my $types = $self->has_types ? $self->types : {};

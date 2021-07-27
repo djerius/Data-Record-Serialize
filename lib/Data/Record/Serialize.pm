@@ -61,7 +61,6 @@ sub make_variant {
     }
 
     else {
-
         # default sink
         my $sink = 'Data::Record::Serialize::Sink::'
           . ( $attr{sink} ? lc $attr{sink} : 'stream' );
@@ -84,7 +83,6 @@ list of key-value pairs. See L</ATTRIBUTES> for more information.
 
 
 sub new {
-
     my $class = shift;
     my $attr = 'HASH' eq ref $_[0] ? shift : {@_};
 

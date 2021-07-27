@@ -25,7 +25,6 @@ See L<failures/Attributes>.
 =cut
 
 sub _exporter_validate_opts {
-
     my $class = shift;
 
     my ( $globals ) = @_;
@@ -57,22 +56,18 @@ failures>).
 
 sub error {
     my $class = shift;
-
     _resolve_class( $class, scalar caller(), __PACKAGE__ )->throw( @_ );
 }
 
 sub _resolve_class {
-
     my ( $class, $caller, @prefix ) = @_;
 
     return join(
         '::', @prefix,
         do {
-
             if ( $class =~ /^::(.*)/ ) {
                 $1;
             }
-
             elsif ( $caller =~ /Data::Record::Serialize::(.*)/ ) {
                 $1 . '::' . $class;
             }

@@ -31,12 +31,10 @@ use namespace::clean;
 =cut
 
 sub setup {
-
     my $self = shift;
 
     $self->say( join( "\t", @{ $self->output_fields } ) );
     $self->say( join( "\t", @{ $self->output_types }{ @{ $self->output_fields } } ) );
-
 }
 
 =for Pod::Coverage

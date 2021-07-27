@@ -18,7 +18,6 @@ has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
 =cut
 
-
 sub encode {
     shift;
     local $Data::Dumper::Terse = 1;
@@ -27,7 +26,6 @@ sub encode {
 }
 
 with 'Data::Record::Serialize::Role::Encode';
-
 
 1;
 

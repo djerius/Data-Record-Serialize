@@ -34,7 +34,6 @@ contents, pass in a copy.
 
 # provide default if not already defined
 sub send {
-
     my $self = shift;
 
     $self->_needs_eol
@@ -46,7 +45,6 @@ sub send {
 sub setup { }
 
 around 'setup' => sub {
-
     my ( $orig, $self, $data ) = @_;
 
     # if fields has not been set yet, set it to the names in the data
@@ -76,7 +74,6 @@ around 'setup' => sub {
 
 
 before 'send' => sub {
-
     my ( $self, $data ) = @_;
 
     # can't do format or numify until we have types, which might need to
@@ -91,15 +88,11 @@ before 'send' => sub {
     # nullify fields (set to undef) those that are zero length
 
     if ( defined( my $nullify = $self->_nullify ) ) {
-
         $data->{$_} = undef
           for grep { defined $data->{$_} && !length $data->{$_} } @$nullify;
     }
 
-    if ( $self->_format ) {
-
-        my $format = $self->_format;
-
+    if ( my $format = $self->_format ) {
         $data->{$_}
           = is_coderef( $format->{$_} )
           ? $format->{$_}( $data->{$_} )
@@ -109,32 +102,22 @@ before 'send' => sub {
     }
 
     if ( $self->_numify ) {
-
         $_ = ( $_ || 0 ) + 0 foreach @{$data}{ @{ $self->numeric_fields } };
-
     }
 
-    if ( $self->rename_fields ) {
-
-        my $rename = $self->rename_fields;
-
+    if ( my $rename = $self->rename_fields ) {
         for my $from ( @{ $self->fields } ) {
-
             my $to = $rename->{$from}
               or next;
 
             hv_store( %$data, $to, $data->{$from} );
             delete $data->{$from};
         }
-
     }
-
 };
 
 sub DEMOLISH {
-
     $_[0]->close;
-
     return;
 }
 

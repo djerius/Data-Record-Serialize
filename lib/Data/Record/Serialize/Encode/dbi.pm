@@ -48,7 +48,6 @@ has dsn => (
     is       => 'ro',
     required => 1,
     coerce   => sub {
-
         my $arg = 'ARRAY' eq ref $_[0] ? $_[0] : [ $_[0] ];
         my @dsn;
         for my $el ( @{$arg} ) {
@@ -108,7 +107,6 @@ has drop_table => (
     default => 0,
 );
 
-
 =attr C<create_table>
 
 If true, a table will be created if it does not exist.
@@ -160,11 +158,11 @@ has db_pass => (
     default => '',
 );
 
-
 has _sth => (
     is       => 'rwp',
     init_arg => undef,
 );
+
 has _dbh => (
     is       => 'rwp',
     init_arg => undef,
@@ -176,12 +174,10 @@ has column_defs => (
     clearer  => 1,
     init_arg => undef,
     builder  => sub {
-
         my $self = shift;
 
         my @column_defs;
         for my $field ( @{ $self->output_fields } ) {
-
             push @column_defs,
               join( ' ',
                 $field,
@@ -191,7 +187,6 @@ has column_defs => (
 
         return join ', ', @column_defs;
     },
-
 );
 
 =attr C<batch>
@@ -246,14 +241,12 @@ has '+_map_types' => (
 );
 
 before '_build__nullify' => sub {
-
     my $self = shift;
     $self->_set__nullify( $self->type_index->{'numeric'} );
 
 };
 
 sub _table_exists {
-
     my $self = shift;
 
     return
@@ -262,7 +255,6 @@ sub _table_exists {
 }
 
 sub _fq_table_name {
-
     my $self = shift;
 
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
@@ -283,7 +275,6 @@ my %producer = (
 );
 
 sub setup {
-
     my $self = shift;
 
     return if $self->_dbh;
@@ -310,8 +301,7 @@ sub setup {
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
 
-    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) )
-    {
+    if ( $self->drop_table || ( $self->create_table && !$self->_table_exists ) ) {
         my $tr = SQL::Translator->new(
             from => sub {
                 my $schema = $_[0]->schema;
@@ -319,7 +309,6 @@ sub setup {
                   or error( 'schema', $schema->error );
 
                 for my $field_name ( @{ $self->output_fields } ) {
-
                     $table->add_field(
                         name      => $field_name,
                         data_type => $self->output_types->{$field_name}
@@ -337,7 +326,6 @@ sub setup {
             producer_args  => { no_transaction => 1 },
             add_drop_table => $self->drop_table && $self->_table_exists,
         );
-
 
         my $sql = $tr->translate
           or error( 'schema', $tr->error );
@@ -415,13 +403,11 @@ As an example of completely flushing the queue while notifying of errors:
 =cut
 
 sub flush {
-
     my $self = shift;
 
     my $queue = $self->queue;
 
     if ( @{ $queue } ) {
-
         my $last;
         eval {
             $self->_sth->execute( @$last )
@@ -461,26 +447,21 @@ more information on how errors are handled.
 =cut
 
 sub send {
-
     my $self = shift;
 
     if ( $self->batch ) {
-
         push @{ $self->queue }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
-
         $self->flush
           if @{ $self->queue } == $self->batch;
 
     }
     else {
-
         eval {
             $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
         };
         error( "insert", { msg => "record insertion failed: $@", payload => $_[0] } )
           if $@;
     }
-
 }
 
 
@@ -510,12 +491,9 @@ As an example of draining the queue while notifying of errors:
       shift $output->queue->@*;
   }
 
-
-
 =cut
 
 sub close {
-
     my $self = shift;
 
     $self->flush
@@ -539,7 +517,6 @@ C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
 =cut
 
 sub DEMOLISH {
-
     my $self = shift;
 
     warnings::warnif( 'Data::Record::Serialize::Encode::dbi::queue', __PACKAGE__.": record queue is not empty in object destruction" )
@@ -547,7 +524,6 @@ sub DEMOLISH {
 
     $self->_dbh->disconnect
       if defined $self->_dbh;
-
 }
 
 
@@ -561,14 +537,12 @@ sub DEMOLISH {
 
 =cut
 
-
 sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
 sub print  { error( 'Encode::stub_method', 'internal error: stub method <print> invoked' ) }
 sub encode { error( 'Encode::stub_method', 'internal error: stub method <encode> invoked' ) }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
-
 
 1;
 

@@ -20,7 +20,6 @@ declare ArrayOfStr,
 coerce ArrayOfStr,
   from Str, q { [ $_ ] };
 
-
 # COPYRIGHT
 
 1;

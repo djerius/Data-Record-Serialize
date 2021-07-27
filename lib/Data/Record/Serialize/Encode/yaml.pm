@@ -18,7 +18,6 @@ has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
 =cut
 
-
 sub encode { shift; goto \&Dump; }
 
 with 'Data::Record::Serialize::Role::Encode';
