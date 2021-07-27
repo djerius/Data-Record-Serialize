@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.23      2021-07-26 12:39:08-04:00 America/New_York
+
+  [BUILD]
+
+    * Missing test prerequisites: Test2::Plugin::NoWarnings, File::Slurper
+
 0.22      2021-07-26 12:39:08-04:00 America/New_York
 
   [BUILD]
