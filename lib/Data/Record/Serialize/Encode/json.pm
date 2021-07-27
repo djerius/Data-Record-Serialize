@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::json;
 
 use Moo::Role;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use JSON::MaybeXS qw[ encode_json ];
 
