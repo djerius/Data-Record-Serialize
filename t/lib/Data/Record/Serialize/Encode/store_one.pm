@@ -5,7 +5,8 @@ use Moo::Role;
 use Types::Standard qw[ ArrayRef ];
 
 has '+_need_types' => ( is => 'rwp', default => 1 );
-has '+_use_integer' => ( is => 'rwp', default => 1 );
+
+sub _use_integer { 1 }
 
 has output => ( is => 'rwp',
                 init_arg => undef,

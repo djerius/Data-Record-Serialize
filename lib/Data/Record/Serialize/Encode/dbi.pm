@@ -231,7 +231,6 @@ has queue => (
     default  => sub { [] },
 );
 
-has '+_use_integer' => ( is => 'rwp', default => 1 );
 
 has '+_need_types' => ( is => 'rwp', default => 1 );
 
@@ -240,6 +239,8 @@ before '_build__nullify' => sub {
     $self->_set__nullify( $self->type_index->{'numeric'} );
 
 };
+
+sub _use_integer { 1 }
 
 sub _map_types { { S => 'text', N => 'real', I => 'integer'} }
 

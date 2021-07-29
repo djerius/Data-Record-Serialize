@@ -159,15 +159,6 @@ has _need_types => (
     default  => 1,
 );
 
-has _use_integer => (
-    is       => 'rwp',
-    isa      => Bool,
-    init_arg => undef,
-    default  => 1,
-    # just in case need_types isn't explicitly set...
-    trigger => sub { $_[0]->_set__need_types( 1 ) },
-);
-
 has _needs_eol => (
     is       => 'rwp',
     isa      => Bool,

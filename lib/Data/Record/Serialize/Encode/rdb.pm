@@ -10,11 +10,6 @@ has '+_need_types' => (
     is      => 'rwp',
     default => 1,
 );
-has '+_use_integer' => (
-    is      => 'rwp',
-    default => 0,
-);
-
 has '+_needs_eol' => (
     is      => 'rwp',
     default => 1,
@@ -22,7 +17,9 @@ has '+_needs_eol' => (
 
 use namespace::clean;
 
+sub _use_integer { 0 }
 sub _map_types { { N => 'N', I => 'N', S => 'S'  } }
+
 
 =for Pod::Coverage
   setup

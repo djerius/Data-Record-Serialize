@@ -47,6 +47,8 @@ sub setup { }
 # just in case it's not defined in preceding roles
 sub _map_types { }
 
+sub _use_integer { 1 }
+
 around 'setup' => sub {
     my ( $orig, $self, $data ) = @_;
 
