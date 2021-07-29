@@ -388,8 +388,8 @@ has output_types => (
             $_ = 'N' foreach grep { $_ eq 'I' } values %types;
         }
 
-        if ( $self->_has_map_types ) {
-            $types{$_} = $self->_map_types->{ $types{$_} } foreach keys %types;
+        if ( my $map_types = $self->_map_types ) {
+            $types{$_} = $map_types->{ $types{$_} } foreach keys %types;
         }
 
         for my $key ( keys %types ) {
@@ -404,12 +404,6 @@ has output_types => (
 );
 
 sub _trigger_output_types { }
-
-has _map_types => (
-    is        => 'rwp',
-    init_arg  => undef,
-    predicate => 1,
-);
 
 =attr C<format_fields>
 

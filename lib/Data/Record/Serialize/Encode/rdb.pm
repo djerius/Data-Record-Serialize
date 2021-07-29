@@ -14,16 +14,15 @@ has '+_use_integer' => (
     is      => 'rwp',
     default => 0,
 );
-has '+_map_types' => (
-    is      => 'rwp',
-    default => sub { { N => 'N', I => 'N', S => 'S' } },
-);
+
 has '+_needs_eol' => (
     is      => 'rwp',
     default => 1,
 );
 
 use namespace::clean;
+
+sub _map_types { { N => 'N', I => 'N', S => 'S'  } }
 
 =for Pod::Coverage
   setup

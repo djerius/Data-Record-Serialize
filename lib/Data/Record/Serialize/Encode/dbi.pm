@@ -235,16 +235,13 @@ has '+_use_integer' => ( is => 'rwp', default => 1 );
 
 has '+_need_types' => ( is => 'rwp', default => 1 );
 
-has '+_map_types' => (
-    is      => 'rwp',
-    default => sub { {S => 'text', N => 'real', I => 'integer'} },
-);
-
 before '_build__nullify' => sub {
     my $self = shift;
     $self->_set__nullify( $self->type_index->{'numeric'} );
 
 };
+
+sub _map_types { { S => 'text', N => 'real', I => 'integer'} }
 
 sub _table_exists {
     my $self = shift;

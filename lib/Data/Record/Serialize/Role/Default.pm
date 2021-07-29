@@ -44,6 +44,9 @@ sub send {
 # provide default if not already defined
 sub setup { }
 
+# just in case it's not defined in preceding roles
+sub _map_types { }
+
 around 'setup' => sub {
     my ( $orig, $self, $data ) = @_;
 
