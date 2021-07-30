@@ -11,7 +11,7 @@ use JSON::MaybeXS qw[ encode_json ];
 use namespace::clean;
 
 sub _numify { 1 }
-has '+_needs_eol' => ( is => 'rwp', default => 1 );
+sub _needs_eol { 1 }
 
 =for Pod::Coverage
   encode

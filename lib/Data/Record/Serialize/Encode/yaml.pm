@@ -11,7 +11,7 @@ use YAML::Any qw[ Dump ];
 use namespace::clean;
 
 has '+_need_types' => ( is => 'rwp', default => 0 );
-has '+_needs_eol' => ( is => 'rwp', default => 1 );
+sub _needs_eol { 1 }
 
 =for Pod::Coverage
  encode
@@ -41,7 +41,6 @@ __END__
 B<Data::Record::Serialize::Encode::yaml> encodes a record as YAML.
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
-
 
 =head1 INTERFACE
 

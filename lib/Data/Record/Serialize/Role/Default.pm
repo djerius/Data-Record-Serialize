@@ -41,15 +41,12 @@ sub send {
       : $self->print( $self->encode( @_ ) );
 }
 
-# provide default if not already defined
+# just in case they're not defined in preceding roles
 sub setup { }
-
-# just in case it's not defined in preceding roles
 sub _map_types { }
-
 sub _use_integer { 1 }
-
 sub _numify { 0 }
+sub _needs_eol { 1 }
 
 around 'setup' => sub {
     my ( $orig, $self, $data ) = @_;

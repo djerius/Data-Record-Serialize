@@ -11,7 +11,7 @@ use Data::Dumper;
 use namespace::clean;
 
 has '+_need_types' => ( is => 'rwp', default => 0 );
-has '+_needs_eol' => ( is => 'rwp', default => 1 );
+sub _needs_eol { 1 }
 
 =for Pod::Coverage
   encode

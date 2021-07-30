@@ -159,13 +159,6 @@ has _need_types => (
     default  => 1,
 );
 
-has _needs_eol => (
-    is       => 'rwp',
-    isa      => Bool,
-    init_arg => undef,
-    default  => 1,
-);
-
 =attr nullify
 
 Specify which fields should be set to C<undef> if they are
