@@ -9,14 +9,14 @@ our $VERSION = '0.24';
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
 use Types::Standard
-  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
+  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef ];
+use Data::Record::Serialize::Types qw( SerializeType );
 
 use Ref::Util qw[ is_coderef is_arrayref ];
 
 use POSIX ();
 
 use namespace::clean;
-
 
 =attr C<types>
 
@@ -44,7 +44,7 @@ returns true if L</types> has been set.
 
 has types => (
     is  => 'rwp',
-    isa => ( HashRef [ Enum [qw( N I S )] ] | CycleTuple [ Str, Enum [qw( N I S )] ] ),   # need parens for perl <= 5.12.5
+    isa => ( HashRef [ SerializeType ] | CycleTuple [ Str, SerializeType ] ),   # need parens for perl <= 5.12.5
     predicate => 1,
     trigger   => sub {
         $_[0]->clear_type_index;
@@ -69,7 +69,7 @@ returns true if L</default_type> has been set.
 
 has default_type => (
     is  => 'ro',
-    isa => Enum [qw( N I S )] | Undef,
+    isa => SerializeType,
     predicate => 1
 );
 
@@ -167,6 +167,13 @@ has _have_initialized_types => (
     is       => 'rwp',
     init_arg => undef,
     isa      => Bool,
+    default  => 0,
+);
+
+has _boolify => (
+    is       => 'rwp',
+    isa      => Bool,
+    init_arg => undef,
     default  => 0,
 );
 
@@ -291,7 +298,27 @@ The input field names for those fields deemed to be numeric.
 
 =cut
 
-sub numeric_fields { return $_[0]->type_index->{'numeric'} }
+has numeric_fields => (
+    is        => 'lazy',
+    init_args => undef,
+    clearer   => 1,
+    builder   => sub { $_[0]->type_index->{'numeric'} },
+);
+
+=method B<boolean_fields>
+
+  $array_ref = $s->boolean_fields;
+
+The input field names for those fields deemed to be boolean.
+
+=cut
+
+has boolean_fields => (
+    is        => 'lazy',
+    init_args => undef,
+    clearer   => 1,
+    builder   => sub { $_[0]->type_index->{'B'} },
+);
 
 =method B<type_index>
 
@@ -325,7 +352,7 @@ Everything but C<S>.
 has type_index => (
     is       => 'lazy',
     init_arg => undef,
-    clearer  => 1,
+    clearer  => '_clear_type_index',
     builder  => sub {
         my $self  = shift;
 
@@ -343,12 +370,25 @@ has type_index => (
           [ S          => qr/S/i ],
           [ N          => qr/N/i ],
           [ I          => qr/I/i ],
+          [ B          => qr/B/i ],
           [ numeric    => qr/[NI]/i ],
           [ not_string => qr/^[^S]+$/ ];
 
         return \%index;
     },
 );
+
+=for Pod::Coverage
+clear_type_index
+
+=cut
+
+sub clear_type_index {
+    my $self = shift;
+    $self->_clear_type_index;
+    $self->clear_boolean_fields;
+    $self->clear_numeric_fields;
+}
 
 =method B<output_types>
 

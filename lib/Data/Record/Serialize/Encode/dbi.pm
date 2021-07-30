@@ -238,7 +238,7 @@ before '_build__nullify' => sub {
 };
 
 sub _use_integer { 1 }
-sub _map_types { { S => 'text', N => 'real', I => 'integer'} }
+sub _map_types { { S => 'text', N => 'real', I => 'integer', B => 'boolean' } }
 
 sub _table_exists {
     my $self = shift;

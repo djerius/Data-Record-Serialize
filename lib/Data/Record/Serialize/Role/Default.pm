@@ -104,6 +104,10 @@ before 'send' => sub {
         $_ = ( $_ || 0 ) + 0 foreach @{$data}{ @{ $self->numeric_fields } };
     }
 
+    if ( $self->_boolify ) {
+        $_ = $self->_to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
+    }
+
     if ( my $rename = $self->rename_fields ) {
         for my $from ( @{ $self->fields } ) {
             my $to = $rename->{$from}
