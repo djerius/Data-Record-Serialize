@@ -59,16 +59,11 @@ around 'setup' => sub {
     my %dups;
     $dups{$_}++ && error( fields => "duplicate output field: $_" ) for@{$self->fields};
 
-    if ( $self->_need_types ) {
-
-        if ( $self->default_type ) {
-            $self->_set_types_from_default;
-        }
-        else {
-            $self->_set_types_from_record( $data );
-        }
-
-        $self->_set__need_types( 0 );
+    if ( $self->has_default_type ) {
+        $self->_set_types_from_default;
+    }
+    else {
+        $self->_set_types_from_record( $data );
     }
 
     $orig->( $self );

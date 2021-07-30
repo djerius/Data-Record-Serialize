@@ -8,8 +8,6 @@ our $VERSION = '0.24';
 
 use namespace::clean;
 
-has '+_need_types' => ( is => 'rwp', default => 0 );
-
 =for Pod::Coverage
  encode
  send

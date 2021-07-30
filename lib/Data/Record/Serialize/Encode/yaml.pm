@@ -10,7 +10,6 @@ use YAML::Any qw[ Dump ];
 
 use namespace::clean;
 
-has '+_need_types' => ( is => 'rwp', default => 0 );
 sub _needs_eol { 1 }
 
 =for Pod::Coverage

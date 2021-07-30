@@ -6,7 +6,7 @@ use Moo::Role;
 
 our $VERSION = '0.24';
 
-use Data::Record::Serialize::Error { errors => [ 'fields' ] }, -all;
+use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
 use Types::Standard
   qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Undef ];
@@ -16,6 +16,7 @@ use Ref::Util qw[ is_coderef is_arrayref ];
 use POSIX ();
 
 use namespace::clean;
+
 
 =attr C<types>
 
@@ -60,9 +61,16 @@ L</types>, please see L</Fields and their types>.
 
 =cut
 
+=method has_default_type
+
+returns true if L</default_type> has been set.
+
+=cut
+
 has default_type => (
     is  => 'ro',
     isa => Enum [qw( N I S )] | Undef,
+    predicate => 1
 );
 
 =attr C<fields>
@@ -152,11 +160,14 @@ has _run_setup => (
     default   => 1,
 );
 
-has _need_types => (
+
+# have we initialized types? can't simply use $self->has_types, as
+# the caller may have provided some.
+has _have_initialized_types => (
     is       => 'rwp',
-    isa      => Bool,
     init_arg => undef,
-    default  => 1,
+    isa      => Bool,
+    default  => 0,
 );
 
 =attr nullify
@@ -312,14 +323,17 @@ Everything but C<S>.
 =cut
 
 has type_index => (
-    is       => 'ro',
-    lazy     => 1,
+    is       => 'lazy',
     init_arg => undef,
     clearer  => 1,
     builder  => sub {
         my $self  = shift;
-        my $types = $self->types;
 
+        # whoops; no types?
+        error( 'types', "no types for fields are available" )
+          unless $self->has_types;
+
+        my $types = $self->types;
         my %index = map {
             my ( $type, $re ) = @$_;
             {
@@ -412,10 +426,8 @@ argument, and should return the formatted value.
 =cut
 
 has format_types => (
-    is  => 'ro',
-    isa => HashRef [Str | CodeRef],
-    # we'll need to gather types
-    trigger => sub { $_[0]->_set__need_types( 1 ) if keys %{ $_[1] }; },
+    is        => 'ro',
+    isa       => HashRef [ Str | CodeRef ],
 );
 
 
@@ -510,8 +522,8 @@ sub BUILD {
 
     # if types is passed, set fields if it's not set.
     # convert types to hash if it's an array
-    my $types;
-    if ( defined( $types = $self->types ) ) {
+    if ( $self->has_types ) {
+        my $types = $self->types;
 
         if ( 'HASH' eq ref $types ) {
             $self->_set_fields( [ keys %{$types} ] )
@@ -522,7 +534,8 @@ sub BUILD {
 
             if ( ! $self->has_fields ) {
                 my @fields;
-                push @fields, $types->[ 2 * $_ ] for 0 .. ( @{$types} / 2 ) - 1;
+                # pull off "keys"
+                push @fields, ( shift @$types, shift @$types )[0] while @$types;
                 $self->_set_fields( \@fields );
             }
         }
@@ -532,17 +545,15 @@ sub BUILD {
     }
 
     if ( $self->has_fields ) {
-        if ( ref $self->fields ) {
 
+        if ( ref $self->fields ) {
             # in this specific case everything can be done before the first
             # record is read.  this is kind of overkill, but at least one
             # test depended upon being able to determine types prior
             # to sending the first record, so need to do this here rather
             # than in Default::setup
-            if ( $self->_need_types && defined $self->default_type ) {
-                $self->_set_types_from_default;
-                $self->_set__need_types( 0 );
-            }
+            $self->_set_types_from_default
+              if $self->has_default_type;
         }
 
         # if fields eq 'all', clear out the attribute so that it will get
@@ -557,6 +568,8 @@ sub BUILD {
 
 sub _set_types_from_record {
     my ( $self, $data ) = @_;
+
+    return if $self->_have_initialized_types;
 
     my $types = $self->has_types ? $self->types : {};
 
@@ -573,10 +586,13 @@ sub _set_types_from_record {
     }
 
     $self->_set_types( $types );
+    $self->_set__have_initialized_types( 1 );
 }
 
 sub _set_types_from_default {
     my $self = shift;
+
+    return if $self->_have_initialized_types;
 
     my $types = $self->has_types ? $self->types : {};
 
@@ -584,6 +600,7 @@ sub _set_types_from_default {
       for grep { !defined $types->{$_} } @{ $self->fields };
 
     $self->_set_types( $types );
+    $self->_set__have_initialized_types( 1 );
 }
 
 
