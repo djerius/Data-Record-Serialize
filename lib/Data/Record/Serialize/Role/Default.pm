@@ -49,6 +49,8 @@ sub _map_types { }
 
 sub _use_integer { 1 }
 
+sub _numify { 0 }
+
 around 'setup' => sub {
     my ( $orig, $self, $data ) = @_;
 
