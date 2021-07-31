@@ -9,7 +9,6 @@ our $VERSION = '0.24';
 use namespace::clean;
 
 sub _needs_eol { 1 }
-sub _use_integer { 0 }
 sub _map_types { { N => 'N', I => 'N', S => 'S'  } }
 
 

@@ -21,7 +21,7 @@ coerce ArrayOfStr,
   from Str, q { [ $_ ] };
 
 declare SerializeType,
-  as Enum[ qw( N I S B ) ];
+  as Enum[ qw( N I S B) ];
 
 # COPYRIGHT
 

@@ -8,11 +8,14 @@ our $VERSION = '0.24';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
+use Data::Record::Serialize::Util -all;
+
 use Types::Standard
   qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef ];
 use Data::Record::Serialize::Types qw( SerializeType );
 
-use Ref::Util qw[ is_coderef is_arrayref ];
+use Ref::Util qw( is_coderef is_arrayref );
+use List::Util 1.33 qw( any );
 
 use POSIX ();
 
@@ -125,7 +128,7 @@ has _fieldh => (
     builder  => sub {
         my $self = shift;
         my %fieldh;
-        @fieldh{ @{ $self->fields } } = ( 1 ) x @{ $self->fields };
+        @fieldh{ @{ $self->fields } } = ();
         return \%fieldh;
     },
 );
@@ -171,10 +174,10 @@ has _have_initialized_types => (
 );
 
 has _boolify => (
-    is       => 'rwp',
+    is       => 'lazy',
     isa      => Bool,
     init_arg => undef,
-    default  => 0,
+    builder  => sub { !! $_[0]->can( 'to_bool' ) },
 );
 
 =attr nullify
@@ -252,49 +255,52 @@ sub nullified {
 
 
 has _nullify => (
-    is       => 'rwp',
-    lazy     => 1,
-    isa      => ArrayRef [Str],
-    clearer  => 1,
+    is        => 'rwp',
+    lazy      => 1,
+    isa       => ArrayRef [Str],
+    clearer   => 1,
     predicate => 1,
-    init_arg => undef,
-    builder  => sub {
-        my $self = shift;
+    init_arg  => undef,
+    builder   => 1,
+);
 
-        if ( $self->has_nullify ) {
-            my $nullify = $self->nullify;
+sub _build__nullify {
+    my $self = shift;
 
-            if ( is_coderef( $nullify ) ) {
-                $nullify = (ArrayRef[Str])->assert_return( $nullify->( $self ) );
-            }
-            elsif ( is_arrayref( $nullify ) ) {
-                $nullify = [ @$nullify ];
-            }
-            else {
-                $nullify = [ $nullify ? @{$self->fields} : () ];
-            }
+    if ( $self->has_nullify ) {
+        my $nullify = $self->nullify;
 
-            my $fieldh = $self->_fieldh;
-            my @not_field = grep { ! exists $fieldh->{$_} } @{ $nullify };
-            error( 'fields', "unknown nullify fields: ", join( ', ', @not_field ) )
-              if @not_field;
-
-            return $nullify;
+        if ( is_coderef( $nullify ) ) {
+            $nullify = ( ArrayRef [Str] )->assert_return( $nullify->( $self ) );
+        }
+        elsif ( is_arrayref( $nullify ) ) {
+            $nullify = [@$nullify];
+        }
+        else {
+            $nullify = [ $nullify ? @{ $self->fields } : () ];
         }
 
-        # this allows encoder's to use a before or around modifier
-        # applied to _build__nullify to specify a default via
-        # $self->_set__nullify.
-        $self->_has_nullify ? $self->_nullify : [];
-    },
-);
+        my $fieldh = $self->_fieldh;
+        my @not_field = grep { !exists $fieldh->{$_} } @{$nullify};
+        error( 'fields', "unknown nullify fields: ", join( ', ', @not_field ) )
+          if @not_field;
+
+        return $nullify;
+    }
+
+    # this allows encoder's to use a before or around modifier
+    # applied to _build__nullify to specify a default via
+    # $self->_set__nullify.
+    $self->_has_nullify ? $self->_nullify : [];
+}
+
 
 
 =method B<numeric_fields>
 
   $array_ref = $s->numeric_fields;
 
-The input field names for those fields deemed to be numeric.
+The input field names for those fields deemed to be numeric (either N or I).
 
 =cut
 
@@ -302,7 +308,7 @@ has numeric_fields => (
     is        => 'lazy',
     init_args => undef,
     clearer   => 1,
-    builder   => sub { $_[0]->type_index->{'numeric'} },
+    builder   => sub { $_[0]->type_index->[NUMBER] },
 );
 
 =method B<boolean_fields>
@@ -317,14 +323,14 @@ has boolean_fields => (
     is        => 'lazy',
     init_args => undef,
     clearer   => 1,
-    builder   => sub { $_[0]->type_index->{'B'} },
+    builder   => sub { $_[0]->type_index->[ BOOLEAN ] },
 );
 
 =method B<type_index>
 
   $hash = $s->type_index;
 
-A hash, keyed off of field type or category.  The values are
+An array, with indices given by keyed off of field type or category.  The values are
 an array of field names.  I<Don't edit this!>.
 
 The hash keys are:
@@ -354,29 +360,13 @@ has type_index => (
     init_arg => undef,
     clearer  => '_clear_type_index',
     builder  => sub {
-        my $self  = shift;
-
-        # whoops; no types?
+        my $self = shift;
         error( 'types', "no types for fields are available" )
           unless $self->has_types;
-
-        my $types = $self->types;
-        my %index = map {
-            my ( $type, $re ) = @$_;
-            {
-                $type => [ grep { $types->{$_} =~ $re } keys %{$types} ]
-            }
-          }
-          [ S          => qr/S/i ],
-          [ N          => qr/N/i ],
-          [ I          => qr/I/i ],
-          [ B          => qr/B/i ],
-          [ numeric    => qr/[NI]/i ],
-          [ not_string => qr/^[^S]+$/ ];
-
-        return \%index;
+        index_types( $self->types );
     },
 );
+
 
 =for Pod::Coverage
 clear_type_index
@@ -405,35 +395,52 @@ has output_types => (
     init_arg => undef,
     clearer  => 1,
     trigger  => 1,
-    builder  => sub {
-        my $self = shift;
-        my %types;
+                    );
 
-        return unless $self->has_types;
+sub _build_output_types {
+    my $self = shift;
+    my %types;
 
-        my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
-        @types{@int_fields} = @{ $self->types }{@int_fields};
+    error( 'types', "no types for fields are available" )
+      unless $self->has_types;
 
-        unless ( $self->_use_integer ) {
-            $_ = 'N' foreach grep { $_ eq 'I' } values %types;
+    my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
+    @types{@int_fields} = @{ $self->types }{@int_fields};
+
+    unless ( $self->encoder_has_type(INTEGER) ) {
+        $types{$_} = T_NUMBER for @{ $self->numeric_fields };
+    }
+
+    unless ( $self->encoder_has_type(BOOLEAN) ) {
+        $_ = T_INTEGER for @{ $self->boolean_fields };
+    }
+
+    if ( my $map_types = $self->_map_types ) {
+        for my $field ( keys %types ) {
+            my $type = $types{$field};
+            next unless  exists $map_types->{$type};
+            $types{$field} = $map_types->{ $type }
         }
+    }
 
-        if ( my $map_types = $self->_map_types ) {
-            $types{$_} = $map_types->{ $types{$_} } foreach keys %types;
-        }
+    for my $key ( keys %types ) {
+        my $rename = $self->rename_fields->{$key}
+          or next;
 
-        for my $key ( keys %types ) {
-            my $rename = $self->rename_fields->{$key}
-              or next;
+        $types{$rename} = delete $types{$key};
+    }
 
-            $types{$rename} = delete $types{$key};
-        }
-
-        \%types;
-    },
-);
+    \%types;
+}
 
 sub _trigger_output_types { }
+
+
+sub encoder_has_type {
+    my ( $self, $type ) = @_;
+    any { is_type($_, $type ) } keys %{ $self->_map_types // {} };
+}
+
 
 =attr C<format_fields>
 
@@ -615,11 +622,10 @@ sub _set_types_from_record {
 
     for my $field ( grep !defined $types->{$_}, @{ $self->fields } ) {
         my $value = $data->{$field};
-        my $def = Scalar::Util::looks_like_number( $value ) ? 'N' : 'S';
+        my $def = Scalar::Util::looks_like_number( $value ) ? T_NUMBER : T_STRING;
 
-        $def = 'I'
-          if $self->_use_integer
-          && $def eq 'N'
+        $def = T_INTEGER
+          if $def eq T_NUMBER
           && POSIX::floor( $value ) == POSIX::ceil( $value );
 
         $types->{$field} = $def;

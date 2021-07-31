@@ -4,7 +4,7 @@ use Moo::Role;
 
 use Types::Standard qw[ ArrayRef ];
 
-sub _use_integer { 1 }
+sub map_types { { I => 'I' } }
 
 has output => ( is => 'rwp',
                 init_arg => undef,

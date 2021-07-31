@@ -137,7 +137,8 @@ subtest "nullify sub" => sub {
         lives {
             $drs = Data::Record::Serialize->new(
                 encode  => 'store_one',
-                nullify => sub { shift->type_index->{'numeric'} } )
+                nullify => sub { shift->numeric_fields },
+              )
         },
         'construct object'
     ) or note $@;

@@ -233,11 +233,10 @@ has queue => (
 
 before '_build__nullify' => sub {
     my $self = shift;
-    $self->_set__nullify( $self->type_index->{'numeric'} );
+    $self->_set__nullify( $self->numeric_fields );
 
 };
 
-sub _use_integer { 1 }
 sub _map_types { { S => 'text', N => 'real', I => 'integer', B => 'boolean' } }
 
 sub _table_exists {

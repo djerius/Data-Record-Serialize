@@ -44,7 +44,6 @@ sub send {
 # just in case they're not defined in preceding roles
 sub setup { }
 sub _map_types { }
-sub _use_integer { 1 }
 sub _numify { 0 }
 sub _needs_eol { 1 }
 
@@ -82,7 +81,7 @@ before 'send' => sub {
       if $self->_run_setup;
 
     # remove fields that won't be output
-    delete @{$data}{ grep { !defined $self->_fieldh->{$_} } keys %{$data} };
+    delete @{$data}{ grep { !exists $self->_fieldh->{$_} } keys %{$data} };
 
     # nullify fields (set to undef) those that are zero length
 
