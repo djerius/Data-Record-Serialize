@@ -247,6 +247,8 @@ sub _map_types {
     $MapTypes{ $_[0]->_dbi_driver } // $MapTypes{ Default }
 }
 
+sub _to_bool { $_[0] ? 1 : 0 }
+
 sub _table_exists {
     my $self = shift;
 

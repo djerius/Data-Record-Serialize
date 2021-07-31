@@ -13,6 +13,8 @@ use namespace::clean;
 sub _numify { 1 }
 sub _needs_eol { 1 }
 
+sub _to_bool { $_[0] ? \1 : \0 }
+
 =for Pod::Coverage
   encode
 
