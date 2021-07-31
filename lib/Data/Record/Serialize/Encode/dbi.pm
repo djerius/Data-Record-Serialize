@@ -237,7 +237,15 @@ before '_build__nullify' => sub {
 
 };
 
-sub _map_types { { S => 'text', N => 'real', I => 'integer', B => 'boolean' } }
+my %MapTypes = (
+    Pg      => { S => 'text', N => 'real', I => 'integer', B => 'boolean' },
+    SQLite  => { S => 'text', N => 'real', I => 'integer', B => 'integer' },
+    Default => { S => 'text', N => 'real', I => 'integer', B => 'integer' },
+);
+
+sub _map_types {
+    $MapTypes{ $_[0]->_dbi_driver } // $MapTypes{ Default }
+}
 
 sub _table_exists {
     my $self = shift;
@@ -253,9 +261,19 @@ sub _fq_table_name {
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
-=for Pod::Coverage setup
+has _dsn_components => (
+    is       => 'lazy',
+    init_arg => undef,
+    builder  => sub {
+        my @dsn = DBI->parse_dsn( $_[0]->dsn )
+            or error( 'param', "unable to parse DSN: ", $_[0]->dsn );
+        \@dsn;
+    },
+);
 
-=cut
+sub _dbi_driver {
+    $_[0]->_dsn_components->[1];
+}
 
 my %producer = (
     DB2       => 'DB2',
@@ -267,16 +285,24 @@ my %producer = (
     Sybase    => 'Sybase',
 );
 
+has _producer => (
+    is       => 'lazy',
+    init_arg => undef,
+    builder  => sub {
+        my $dbi_driver = $_[0]->_dbi_driver;
+        $producer{$dbi_driver} || $dbi_driver;
+    },
+);
+
+=for Pod::Coverage setup
+
+=cut
+
+
 sub setup {
     my $self = shift;
 
     return if $self->_dbh;
-
-    my @dsn = DBI->parse_dsn( $self->dsn )
-      or error( 'param', "unable to parse DSN: ", $self->dsn );
-    my $dbi_driver = $dsn[1];
-
-    my $producer = $producer{$dbi_driver} || $dbi_driver;
 
     my %attr = (
         AutoCommit => !$self->batch,
@@ -285,7 +311,7 @@ sub setup {
     );
 
     $attr{sqlite_allow_multiple_statements} = 1
-      if $dbi_driver eq 'SQLite';
+      if $self->_dbi_driver eq 'SQLite';
 
     $self->_set__dbh(
         DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
@@ -315,7 +341,7 @@ sub setup {
 
                 1;
             },
-            to             => $producer,
+            to             => $self->_producer,
             producer_args  => { no_transaction => 1 },
             add_drop_table => $self->drop_table && $self->_table_exists,
         );
