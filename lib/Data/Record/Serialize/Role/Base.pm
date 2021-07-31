@@ -407,12 +407,12 @@ sub _build_output_types {
     my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
     @types{@int_fields} = @{ $self->types }{@int_fields};
 
-    unless ( $self->encoder_has_type(INTEGER) ) {
-        $types{$_} = T_NUMBER for @{ $self->numeric_fields };
-    }
-
     unless ( $self->encoder_has_type(BOOLEAN) ) {
         $_ = T_INTEGER for @{ $self->boolean_fields };
+    }
+
+    unless ( $self->encoder_has_type(INTEGER) ) {
+        $types{$_} = T_NUMBER for @{ $self->numeric_fields };
     }
 
     if ( my $map_types = $self->_map_types ) {
