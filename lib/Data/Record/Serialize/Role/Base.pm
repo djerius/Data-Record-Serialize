@@ -141,8 +141,21 @@ has _boolify => (
     is       => 'lazy',
     isa      => Bool,
     init_arg => undef,
+    builder  => sub { $_[0]->_can_bool || $_[0]->_convert_boolean_to_int },
+);
+
+has _convert_boolean_to_int => (
+    is      => 'rwp',
+    default => 0,
+);
+
+has _can_bool => (
+    is       => 'lazy',
+    isa      => Bool,
+    init_arg => undef,
     builder  => sub { !! $_[0]->can( 'to_bool' ) },
 );
+
 
 =attr nullify
 
@@ -347,6 +360,7 @@ sub _build_output_types {
 
     unless ( $self->encoder_has_type(BOOLEAN) ) {
         $_ = T_INTEGER for @{ $self->boolean_fields };
+        $self->_set__convert_boolean_to_int(1);
     }
 
     unless ( $self->encoder_has_type(INTEGER) ) {

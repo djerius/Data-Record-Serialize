@@ -103,8 +103,18 @@ before 'send' => sub {
         $_ = ( $_ || 0 ) + 0 foreach @{$data}{ @{ $self->numeric_fields } };
     }
 
+    # handle boolean
     if ( $self->_boolify ) {
-        $_ = $self->_to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
+
+        if ( $self->_can_bool ) {
+            $_ = $self->_to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
+        }
+
+        # the encoder doesn't have native boolean, must convert a
+        # truthy value to 0/1;
+        else {
+            $_ = $_ ? 1 : 0 foreach @{$data}{ @{ $self->boolean_fields } };
+        }
     }
 
     if ( my $rename = $self->rename_fields ) {
