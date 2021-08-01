@@ -23,21 +23,9 @@ use namespace::clean;
 
 =attr C<types>
 
-A hash or array mapping input field names to types (C<N>, C<I>,
-C<S>).  If an array, the fields will be output in the specified
-order, provided the encoder permits it (see below, however).  For example,
-
-  # use order if possible
-  types => [ c => 'N', a => 'N', b => 'N' ]
-
-  # order doesn't matter
-  types => { c => 'N', a => 'N', b => 'N' }
-
-If C<fields> is specified, then its order will override that specified
-here.
-
-To understand how this attribute works in concert with L</fields> and
-L</default_type>, please see L</Fields and their types>.
+A hash mapping input field names to types (C<N>, C<I>, C<S>, C<B>). If
+types are deduced from the data, this mapping is finalized (and thus
+accurate) only after the first record is written.
 
 =method has_types
 
@@ -57,10 +45,7 @@ has types => (
 
 =attr C<default_type> I<type>
 
-If set, output fields whose types were not
-specified via the C<types> attribute will be assigned this type.
-To understand how this attribute works in concert with L</fields> and
-L</types>, please see L</Fields and their types>.
+The value passed to the constructor (if any).
 
 =cut
 
@@ -78,28 +63,7 @@ has default_type => (
 
 =attr C<fields>
 
-Which fields to output.  It may be one of:
-
-=over
-
-=item *
-
-An array containing the input names of the fields to be output. The
-fields will be output in the specified order, provided the encoder
-permits it.
-
-=item *
-
-The string C<all>, indicating that all input fields will be output.
-
-=item *
-
-Unspecified or undefined.
-
-=back
-
-To understand how this attribute works in concert with L</types> and
-L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+The names of the input fields that will be output.
 
 =method has_fields
 
@@ -138,8 +102,8 @@ has _fieldh => (
 
   $array_ref = $s->output_fields;
 
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
+The names of the output fields, in order of requested output.  This takes into account
+fields which have been renamed.
 
 =cut
 
@@ -182,37 +146,7 @@ has _boolify => (
 
 =attr nullify
 
-Specify which fields should be set to C<undef> if they are
-empty. Sinks should encode C<undef> as the C<null> value.  By default,
-no fields are nullified.
-
-B<nullify> may be passed:
-
-=over
-
-=item *  an array
-
-It should be a list of input field names.  These names are verified
-against the input fields after the first record is read.
-
-=item * a code ref
-
-The coderef is passed the object, and should return a list of input
-field names.  These names are verified against the input fields after
-the first record is read.
-
-=item * a boolean
-
-If true, all field names are added to the list. When false, the list
-is emptied.
-
-=back
-
-During verification, a
-C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
-if non-existent fields are specified.  Verification is I<not>
-performed until the next record is sent (or the L</nullified> method
-is called), so there is no immediate feedback.
+The value passed to the constructor (if any).
 
 =method has_nullify
 
@@ -328,28 +262,32 @@ has boolean_fields => (
 
 =method B<type_index>
 
-  $hash = $s->type_index;
+  $arrayref = $s->type_index;
 
-An array, with indices given by keyed off of field type or category.  The values are
-an array of field names.  I<Don't edit this!>.
+An array, with indices representing field type or category.  The values are
+an array of field names. This is finalized (and thus accurate) only after the first record is written.
 
-The hash keys are:
+I<Don't edit this!>.
+
+The indices are available via L<Data::Record::Serialize::Util> and are:
 
 =over
 
-=item C<I>
+=item INTEGER
 
-=item C<N>
+=item FLOAT
 
-=item C<S>
+=item NUMBER
 
-=item C<numeric>
+C<FLOAT> and C<INTEGER>
 
-C<N> and C<I>.
+=item STRING
 
-=item C<not_string>
+=item NOT_STRING
 
-Everything but C<S>.
+everything that's not C<STRING>
+
+=item BOOLEAN
 
 =back
 
@@ -444,13 +382,7 @@ sub encoder_has_type {
 
 =attr C<format_fields>
 
-A hash mapping the input field names to either a C<sprintf> style
-format or a coderef. This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here override those specified in C<format_types>.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
+The value passed to the constructor (if any).
 
 =cut
 
@@ -461,14 +393,7 @@ has format_fields => (
 
 =attr C<format_types>
 
-A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format or a coderef.  This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here may be overridden for specific fields using the
-C<format_fields> attribute.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
+The value passed to the constructor (if any).
 
 =cut
 
@@ -480,8 +405,7 @@ has format_types => (
 
 =attr C<rename_fields>
 
-A hash mapping input to output field names.  By default the input
-field names are used unaltered.
+The value passed to the constructor (if any).
 
 =cut
 

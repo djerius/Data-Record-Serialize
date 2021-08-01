@@ -23,25 +23,6 @@ use namespace::clean;
 
 =cut
 
-=attr C<encode>
-
-I<Required>. The encoding format.  Specific encoders may provide
-additional, or require specific, attributes. See L</Encoders>
-for more information.
-
-=attr C<sink>
-
-Where the encoded data will be sent.  Specific sinks may provide
-additional, or require specific attributes. See L</Sinks> for more
-information.
-
-The default output sink is C<stream>, unless the encoder is also a
-sink.
-
-It is an error to specify a sink if the encoder already acts as one.
-
-=cut
-
 sub make_variant {
     my ( $class, $target, %attr ) = @_;
 
@@ -74,10 +55,127 @@ sub make_variant {
 
 =method B<new>
 
-  $s = Data::Record::Serialize->new( <attributes> );
+  $s = Data::Record::Serialize->new( %args );
+  $s = Data::Record::Serialize->new( \%args );
 
-Construct a new object. I<attributes> may either be a hashref or a
-list of key-value pairs. See L</ATTRIBUTES> for more information.
+Construct a new object. The following arguments are recognized:
+
+=over
+
+=item C<types> => I<hashref>|I<arrayref>
+
+A hash or array mapping input field names to types (C<N>, C<I>,
+C<S>, C<B> ).  If an array, the fields will be output in the specified
+order, provided the encoder permits it (see below, however).  For example,
+
+  # use order if possible
+  types => [ c => 'N', a => 'N', b => 'N' ]
+
+  # order doesn't matter
+  types => { c => 'N', a => 'N', b => 'N' }
+
+If C<fields> is specified, then its order will override that specified
+here.
+
+To understand how this attribute works in concert with L</fields> and
+L</default_type>, please see L</Fields and their types>.
+
+=item C<default_type> => C<S>|C<N>|C<I>|C<B>
+
+The default input type for fields whose types were not specified via
+the C<types>.
+
+To understand how this attribute works in concert with L</fields> and
+L</types>, please see L</Fields and their types>.
+
+=item C<fields> => I<arrayref>|C<all>
+
+The fields to output.  If it is the string C<all>,
+all input fields will be output. If it is an arrayref, the
+fields will be output in the specified order, provided the encoder
+permits it.
+
+To understand how this attribute works in concert with L</types> and
+L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+
+=item C<encode> => I<encoder>
+
+I<Required>. The encoding format.  Specific encoders may provide
+additional, or require specific, attributes. See L</Encoders>
+for more information.
+
+=item C<sink> => I<sink>
+
+Where the encoded data will be sent.  Specific sinks may provide
+additional, or require specific attributes. See L</Sinks> for more
+information.
+
+The default output sink is C<stream>, unless the encoder is also a
+sink.
+
+It is an error to specify a sink if the encoder already acts as one.
+
+=item C<nullify> => I<arrayref>|I<coderef>|Boolean
+
+Fields that should be set to C<undef> if they are
+empty. Sinks should encode C<undef> as the C<null> value.
+
+B<nullify> may be passed:
+
+=over
+
+=item * an arrayref of input field names
+
+=item * a coderef
+
+The coderef is called as
+
+  @input_field_names = $code->( $serializer_object )
+
+=item * a Boolean
+
+If true, all field names are added to the list. When false, the list
+is emptied.
+
+=back
+
+Names are verified against the input fields after the first record is
+sent. A C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
+if non-existent fields are specified.
+
+=item C<format_fields>
+
+A hash mapping the input field names to either a C<sprintf> style
+format or a coderef. This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here override those specified in C<format_types>.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
+
+=item C<format_types>
+
+A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
+format or a coderef.  This will be applied prior to encoding the
+record, but only if the C<format> attribute is also set.  Formats
+specified here may be overridden for specific fields using the
+C<format_fields> attribute.
+
+The coderef will be called with the value to format as its first
+argument, and should return the formatted value.
+
+=item C<rename_fields>
+
+A hash mapping input to output field names.  By default the input
+field names are used unaltered.
+
+=item C<format>
+
+If true, format the output fields using the formats specified in the
+C<format_fields> and/or C<format_types> options.  The default is false.
+
+
+=back
 
 =cut
 
@@ -161,12 +259,11 @@ All records are assumed to have the same structure.
 
 =item *
 
-Fields may have simple types which may be determined automatically.
-Some encoders use this information during encoding.
+Fields may have simple types.
 
 =item *
 
-Fields may be renamed upon output
+Fields may be renamed upon output.
 
 =item *
 
@@ -174,9 +271,62 @@ A subset of the fields may be selected for output.
 
 =item *
 
-Fields may be formatted via C<sprintf> prior to output
+Field values may be transformed prior to output.
 
 =back
+
+=head2 Types
+
+Some output encoders care about the type of a
+field. B<Data::Record::Serialize> recognizes thesea types:
+
+=over
+
+=item *
+
+C<N> - Number (any number)
+
+=item *
+
+C<I> - Integer
+
+Encoded as C<N> if not available.
+
+=item *
+
+C<S> - String
+
+=item *
+
+C<B> - Boolean
+
+Encoded as C<I> if not available.
+
+=back
+
+Not all encoders support separate integer or Boolean types. Where not supported,
+intgers are encoded as numbers and Booleans as integers.
+
+Types may be specified for fields, or may be automatically determined
+from the first record which is output.  It is not possible to
+deterministically determine if a field is Boolean, so that must be
+explicitly noted.  Boolean fields should be "truthy", e.g., when used
+in a conditional, they evaluate to true or false.
+
+=head2 Field transformation
+
+Transformations can be applied to fields prior to output, and may be
+specified for data types as well as for individual fields (the latter
+take precedence).  Transformations are specified via the
+L</formmat_fields> and L</format_types> parameters.  They
+can either be a C<sprintf> compatible format string,
+
+    format_types => { N => '%0.4f' },
+    format_fields => { obsid => '%05d' },
+
+ or a code reference:
+
+    format_types => { B => sub { Lingua::Boolean::Tiny::boolean( $_[0] ) } }
 
 =head2 Encoders
 
@@ -234,29 +384,6 @@ C<null> - send the encoded data to the bit bucket.
 
 =back
 
-=head2 Types
-
-Some output encoders care about the type of a
-field. B<Data::Record::Serialize> recognizes three types:
-
-=over
-
-=item *
-
-C<N> - Numeric
-
-=item *
-
-C<I> - Integral
-
-=item *
-
-C<S> - String
-
-=back
-
-Not all encoders support a separate integral type; in those cases
-integer fields are treated as general numeric fields.
 
 =head2 Fields and their types
 
@@ -271,7 +398,7 @@ In the following table:
  all => the string 'all'
 
 Automatic type determination is done by examining the first
-record send to the output stream.
+record sent to the output stream.
 
   fields types default_type  Result
   ------ ----- ------------  ------
@@ -376,199 +503,19 @@ L<Data::Record::Serialize::Error> hierarchy.
    );
 
 
+=head1 ATTRIBUTES
+
+Object attributes are gathered from
+L</Data::Serialize::Record::Role::Base>,
+L</Data::Serialize::Record::Role::Default>,
+and the L</Data::Serialize::Record::Encode>, and 
+L</Data::Serialize::Record::Sink>,
+modules.
+
 
 =head1 SEE ALSO
 
 L<Data::Serializer>
-
-=attr C<types>
-
-A hash or array mapping input field names to types (C<N>, C<I>,
-C<S>).  If an array, the fields will be output in the specified
-order, provided the encoder permits it (see below, however).  For example,
-
-  # use order if possible
-  types => [ c => 'N', a => 'N', b => 'N' ]
-
-  # order doesn't matter
-  types => { c => 'N', a => 'N', b => 'N' }
-
-If C<fields> is specified, then its order will override that specified
-here.
-
-To understand how this attribute works in concert with L</fields> and
-L</default_type>, please see L</Fields and their types>.
-
-=method has_types
-
-returns true if L</types> has been set.
-
-=attr C<default_type> I<type>
-
-If set, output fields whose types were not
-specified via the C<types> attribute will be assigned this type.
-To understand how this attribute works in concert with L</fields> and
-L</types>, please see L</Fields and their types>.
-
-=attr C<fields>
-
-Which fields to output.  It may be one of:
-
-=over
-
-=item *
-
-An array containing the input names of the fields to be output. The
-fields will be output in the specified order, provided the encoder
-permits it.
-
-=item *
-
-The string C<all>, indicating that all input fields will be output.
-
-=item *
-
-Unspecified or undefined.
-
-=back
-
-To understand how this attribute works in concert with L</types> and
-L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
-
-=method has_fields
-
-returns true if L</fields> has been set.
-
-=method B<output_fields>
-
-  $array_ref = $s->output_fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-=attr nullify
-
-Specify which fields should be set to C<undef> if they are
-empty. Sinks should encode C<undef> as the C<null> value.  By default,
-no fields are nullified.
-
-B<nullify> may be passed:
-
-=over
-
-=item *  an array
-
-It should be a list of input field names.  These names are verified
-against the input fields after the first record is read.
-
-=item * a code ref
-
-The coderef is passed the object, and should return a list of input
-field names.  These names are verified against the input fields after
-the first record is read.
-
-=item * a boolean
-
-If true, all field names are added to the list. When false, the list
-is emptied.
-
-=back
-
-During verification, a
-C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
-if non-existent fields are specified.  Verification is I<not>
-performed until the next record is sent (or the L</nullified> method
-is called), so there is no immediate feedback.
-
-=method has_nullify
-
-returns true if L</nullify> has been set.
-
-=method nullified
-
-  $fields = $obj->nullified;
-
-Returns a list of fields which are checked for empty values (see L</nullify>).
-
-This will return C<undef> if the list is not yet available (for example, if
-fields names are determined from the first output record and none has been sent).
-
-If the list of fields is available, calling B<nullified> may result in
-verification of the list of nullified fields against the list of
-actual fields.  A disparity will result in an exception of class
-C<Data::Record::Serialize::Error::Role::Base::fields>.
-
-=method B<numeric_fields>
-
-  $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
-
-=method B<type_index>
-
-  $hash = $s->type_index;
-
-A hash, keyed off of field type or category.  The values are
-an array of field names.  I<Don't edit this!>.
-
-The hash keys are:
-
-=over
-
-=item C<I>
-
-=item C<N>
-
-=item C<S>
-
-=item C<numeric>
-
-C<N> and C<I>.
-
-=item C<not_string>
-
-Everything but C<S>.
-
-=back
-
-=method B<output_types>
-
-  $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
-
-=attr C<format_fields>
-
-A hash mapping the input field names to either a C<sprintf> style
-format or a coderef. This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here override those specified in C<format_types>.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
-
-=attr C<format_types>
-
-A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-format or a coderef.  This will be applied prior to encoding the
-record, but only if the C<format> attribute is also set.  Formats
-specified here may be overridden for specific fields using the
-C<format_fields> attribute.
-
-The coderef will be called with the value to format as its first
-argument, and should return the formatted value.
-
-=attr C<rename_fields>
-
-A hash mapping input to output field names.  By default the input
-field names are used unaltered.
-
-=attr C<format>
-
-If true, format the output fields using the formats specified in the
-C<format_fields> and/or C<format_types> options.  The default is false.
 
 =for Pod::Coverage
   BUILD
