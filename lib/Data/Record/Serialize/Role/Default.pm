@@ -65,6 +65,9 @@ around 'setup' => sub {
         $self->_set_types_from_record( $data );
     }
 
+    # trigger building of output_types, which also remaps types. ick.
+    $self->output_types;
+
     $orig->( $self );
 
     $self->_set__run_setup( 0 );
@@ -107,7 +110,7 @@ before 'send' => sub {
     if ( $self->_boolify ) {
 
         if ( $self->_can_bool ) {
-            $_ = $self->_to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
+            $_ = $self->to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
         }
 
         # the encoder doesn't have native boolean, must convert a

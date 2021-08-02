@@ -118,6 +118,7 @@ has output_fields => (
     init_arg => undef,
 );
 
+# something for other roles to wrap.
 sub _trigger_output_fields { }
 
 has _run_setup => (
@@ -346,7 +347,7 @@ has output_types => (
     init_arg => undef,
     clearer  => 1,
     trigger  => 1,
-                    );
+);
 
 sub _build_output_types {
     my $self = shift;
@@ -359,7 +360,7 @@ sub _build_output_types {
     @types{@int_fields} = @{ $self->types }{@int_fields};
 
     unless ( $self->encoder_has_type(BOOLEAN) ) {
-        $_ = T_INTEGER for @{ $self->boolean_fields };
+        $types{$_} = T_INTEGER for @{ $self->boolean_fields };
         $self->_set__convert_boolean_to_int(1);
     }
 
@@ -385,6 +386,7 @@ sub _build_output_types {
     \%types;
 }
 
+# something for other roles to wrap.
 sub _trigger_output_types { }
 
 
