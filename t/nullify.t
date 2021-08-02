@@ -11,7 +11,7 @@ subtest "default behavior" => sub {
 
     my $drs;
     ok(
-        lives { $drs = Data::Record::Serialize->new( encode => 'store_one' ) },
+        lives { $drs = Data::Record::Serialize->new( encode => '+My::Test::Encode::store_one' ) },
         'construct object'
     ) or note $@;
 
@@ -43,7 +43,7 @@ subtest "nullify boolean" => sub {
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
-                encode  => 'store_one',
+                encode  => '+My::Test::Encode::store_one',
                 nullify => 1
               )
         },
@@ -103,7 +103,7 @@ subtest "bad field name" => sub {
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
-                encode  => 'store_one',
+                encode  => '+My::Test::Encode::store_one',
                 nullify => ['foobar'] )
         },
         'construct object'
@@ -136,7 +136,7 @@ subtest "nullify sub" => sub {
     ok(
         lives {
             $drs = Data::Record::Serialize->new(
-                encode  => 'store_one',
+                encode  => '+My::Test::Encode::store_one',
                 nullify => sub { shift->numeric_fields },
               )
         },

@@ -15,7 +15,7 @@ subtest "N, N, N" => sub {
 
     ok(
         lives {
-            $s = Data::Record::Serialize->new( encode => 'types_nis', );
+            $s = Data::Record::Serialize->new( encode => '+My::Test::Encode::types_nis', );
         },
         'construct'
     ) or note $@;
@@ -53,7 +53,7 @@ subtest "all, N, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => 'all'
             );
         },
@@ -94,7 +94,7 @@ subtest "N, N, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 default_type => 'S'
             );
         },
@@ -134,7 +134,7 @@ subtest "all, N, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 default_type => 'S',
                 fields       => 'all'
             );
@@ -175,7 +175,7 @@ subtest "Y, N, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => [ 'a', 'b' ] );
         },
         'construct'
@@ -212,7 +212,7 @@ subtest "Y, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => [ 'a', 'c' ],
                 types  => { a => 'S' } );
         },
@@ -250,7 +250,7 @@ subtest "Y, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 fields       => [ 'a', 'b' ],
                 types        => { a => 'S' },
                 default_type => 'I'
@@ -290,7 +290,7 @@ subtest "all, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 fields => 'all',
                 types  => { a => 'S' },
             );
@@ -331,7 +331,7 @@ subtest "all, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 fields       => 'all',
                 types        => { a => 'S' },
                 default_type => 'I'
@@ -373,7 +373,7 @@ subtest "N, Y, Y" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode       => 'types_nis',
+                encode       => '+My::Test::Encode::types_nis',
                 types        => { a => 'S' },
                 default_type => 'I'
             );
@@ -395,7 +395,7 @@ subtest "N, Y, N" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
+                encode => '+My::Test::Encode::types_nis',
                 types  => { a => 'S' },
             );
         },
@@ -419,7 +419,7 @@ subtest "field order" => sub {
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode => 'types_nis',
+                    encode => '+My::Test::Encode::types_nis',
                     fields => [ 'c', 'b', 'a' ],
                 );
             },
@@ -439,7 +439,7 @@ subtest "field order" => sub {
         ok(
             lives {
                 $s = Data::Record::Serialize->new(
-                    encode => 'types_nis',
+                    encode => '+My::Test::Encode::types_nis',
                     types => [ 'c' => 'N', 'b' => 'I', 'a' => 'S' ],
                 );
             },

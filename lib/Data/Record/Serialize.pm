@@ -14,8 +14,28 @@ use Data::Record::Serialize::Error -all;
 our $VERSION = '0.24';
 
 use Package::Variant
-  importing => ['Moo'],
-  subs      => [qw( with has )];
+  importing => [
+    'Moo',
+    'String::RewritePrefix' => [
+        rewrite => {
+            -as      => 'rewrite_encode',
+            prefixes => {
+                ''  => 'Data::Record::Serialize::Encode::',
+                '+' => ''
+            },
+        }
+    ],
+    'String::RewritePrefix' => [
+        rewrite => {
+            -as      => 'rewrite_sink',
+            prefixes => {
+                ''  => 'Data::Record::Serialize::Sink::',
+                '+' => ''
+            },
+        }
+    ],
+  ],
+  subs => [qw( with has rewrite_encode rewrite_sink )];
 
 use namespace::clean;
 
@@ -31,22 +51,19 @@ sub make_variant {
 
     with 'Data::Record::Serialize::Role::Base';
 
-    my $encoder = 'Data::Record::Serialize::Encode::' . lc $attr{encode};
+    my $encoder = rewrite_encode( $attr{encode} );
 
     with $encoder;
 
     if ( $target->does( 'Data::Record::Serialize::Role::Sink' ) ) {
 
-    error( 'attribute::value', "encoder ($attr{encode}) is already a sink; don't specify a sink attribute\n"
+        error( 'attribute::value',
+            "encoder ($encoder) is already a sink; don't specify a sink attribute\n"
         ) if defined $attr{sink};
     }
 
     else {
-        # default sink
-        my $sink = 'Data::Record::Serialize::Sink::'
-          . ( $attr{sink} ? lc $attr{sink} : 'stream' );
-
-        with $sink;
+        with rewrite_sink( $attr{sink} ? $attr{sink} : 'stream' );
     }
 
     with 'Data::Record::Serialize::Role::Default';
@@ -100,15 +117,26 @@ L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
 
 =item C<encode> => I<encoder>
 
-I<Required>. The encoding format.  Specific encoders may provide
-additional, or require specific, attributes. See L</Encoders>
-for more information.
+I<Required>. The module which will encode the data.
+
+With no prefix, it is assumed to be in the
+C<Data::Record::Serialize::Encode> namespace.  With a prefix of C<+>
+it is a fully qualified module name.
+
+Specific encoders may provide additional, or require specific,
+attributes. See L</Encoders> for more information.
 
 =item C<sink> => I<sink>
 
-Where the encoded data will be sent.  Specific sinks may provide
-additional, or require specific attributes. See L</Sinks> for more
-information.
+The module which writes the encoded data.
+
+With no prefix, it is assumed to be in the
+C<Data::Record::Serialize::Sink> namespace.  With a prefix of C<+>
+it is a fully qualified module name.
+
+Specific sinks may provide additional, or require specific
+attributes. See L</Sinks> for more information.
+
 
 The default output sink is C<stream>, unless the encoder is also a
 sink.

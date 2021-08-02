@@ -1,4 +1,4 @@
-package Data::Record::Serialize::Encode::both;
+package My::Test::Encode::both;
 
 use Moo::Role;
 
