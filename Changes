@@ -1,9 +1,11 @@
 {{$NEXT}}
 
+0.24      2021-07-30 23:35:07-04:00 America/New_York
+
   [API BREAKAGE]
 
     * the consistency of the return values of the types, output_types, and fields methods was
-      inconsistent
+      inconsistent. they're now consistent, and different.
 
     * type_index now returns an arrayref; it will probably change further, so use with caution.
 
