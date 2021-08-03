@@ -255,7 +255,15 @@ sub _map_types {
     $MapTypes{ $_[0]->_dbi_driver } // $MapTypes{ Default }
 }
 
-sub _to_bool { $_[0] ? 1 : 0 }
+=method to_bool
+
+   $bool = $self->to_bool( $truthy );
+
+Convert a truthy value to something that the JSON encoders will recognize as a boolean.
+
+=cut
+
+sub to_bool { $_[0] ? 1 : 0 }
 
 sub _table_exists {
     my $self = shift;

@@ -15,7 +15,15 @@ has '+stringify' => ( is => 'ro', default => 1 );
 
 sub _needs_eol { 1 }
 
-sub _to_bool { $_[0] ? \1 : \0 }
+=method to_bool
+
+   $bool = $self->to_bool( $truthy );
+
+Convert a truthy value to something that the JSON encoders will recognize as a boolean.
+
+=cut
+
+sub to_bool { $_[1] ? \1 : \0 }
 
 =for Pod::Coverage
   encode
