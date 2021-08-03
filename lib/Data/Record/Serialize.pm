@@ -482,7 +482,14 @@ C<stream> - L<Data::Record::Serialize::Sink::stream>
 
 C<null> - send the encoded data to the bit bucket.
 
+=item *
+
+C<array> - append the encoded data to an array.
+
 =back
+
+Refer to the documentation for additional constructor options, and
+object and class methods and attributes;
 
 
 =head2 Fields and their types
