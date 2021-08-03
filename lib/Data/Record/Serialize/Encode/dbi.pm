@@ -55,6 +55,13 @@ has dsn => (
     },
 );
 
+has _cached => (
+    is       => 'ro',
+    default  => 0,
+    init_arg => 'cached',
+);
+
+
 =attr C<table>
 
 The value passed to the constructor.
@@ -305,16 +312,19 @@ sub setup {
     return if $self->_dbh;
 
     my %attr = (
-        AutoCommit => !$self->batch,
-        RaiseError => 1,
-        PrintError => 0,
+        AutoCommit               => !$self->batch,
+        RaiseError               => 1,
+        PrintError               => 0,
+        'private_' . __PACKAGE__ => __FILE__ . __LINE__,
     );
 
     $attr{sqlite_allow_multiple_statements} = 1
       if $self->_dbi_driver eq 'SQLite';
 
+    my $connect = $self->_cached ? 'connect_cached' : 'connect';
+
     $self->_set__dbh(
-        DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
+        DBI->$connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
       or error( 'connect', 'error connecting to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
@@ -636,6 +646,11 @@ is transformed to
   SQLite:dbname=$db
 
 The standard prefix of C<dbi:> will be added if not present.
+
+=item C<cached>
+
+If true, the database connection is made with L<DBI::connect_cached|DBI/connect_cached> rather than
+L<DBI::connect|DBI/connect>
 
 =item C<table>
 
