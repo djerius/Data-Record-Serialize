@@ -2,10 +2,10 @@ package Data::Record::Serialize::Encode::yaml;
 
 # ABSTRACT: encode a record as YAML
 
+use Moo::Role;
+
 use Data::Record::Serialize::Error { errors => [ 'yaml_backend' ] }, -all;
 use Types::Standard qw[ Enum ];
-
-use Moo::Role;
 
 our $VERSION = '0.24';
 

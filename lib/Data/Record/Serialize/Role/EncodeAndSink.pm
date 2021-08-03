@@ -7,12 +7,11 @@ use warnings;
 
 our $VERSION = '0.24';
 
-
 use Data::Record::Serialize::Error { errors => [ qw( internal  ) ] }, -all;
 
-use namespace::clean;
-
 use Moo::Role;
+
+use namespace::clean;
 
 ( *say, *print, *encode ) = map {
     my $stub = $_;
