@@ -11,7 +11,7 @@ use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 use Data::Record::Serialize::Util -all;
 
 use Types::Standard
-  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef ];
+  qw[ ArrayRef CodeRef CycleTuple HashRef Enum Str Bool is_HashRef Maybe ];
 use Data::Record::Serialize::Types qw( SerializeType );
 
 use Ref::Util qw( is_coderef is_arrayref );
@@ -23,9 +23,12 @@ use namespace::clean;
 
 =attr C<types>
 
-A hash mapping input field names to types (C<N>, C<I>, C<S>, C<B>). If
-types are deduced from the data, this mapping is finalized (and thus
-accurate) only after the first record is written.
+If no types are available, returns C<undef>; see also L</has_types>.
+
+Otherwise, returns a hashref whose keys are the input field names and
+whose values are the types (C<N>, C<I>, C<S>, C<B>). If types are
+deduced from the data, this mapping is finalized (and thus accurate)
+only after the first record has been sent.
 
 =method has_types
 
@@ -158,6 +161,43 @@ has _can_bool => (
 );
 
 
+=begin internals
+
+=sub _build_field_list_with_type
+
+  $list = $s->_build_field_list_with_type( $list_spec, $type, $error_label );
+
+Given a specification for a list (see the nullify, stringify, and
+numify attributes) and the field type (e.g. STRING, NUMERIC, BOOLEAN,
+ANY ) if the specification is boolean, return a list.
+
+=end internals
+
+
+=cut
+
+sub _build_field_list_with_type {
+    my ( $self, $list_spec, $type, $error_label ) = @_;
+
+    my $list = do {
+        if ( is_coderef( $list_spec ) ) {
+            ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
+        }
+        elsif ( is_arrayref( $list_spec ) ) {
+            [@$list_spec];
+        }
+        else {
+            [ $list_spec ? @{ $self->type_index->[ $type ] } : () ];
+        }
+    };
+    my $fieldh    = $self->_fieldh;
+    my @not_field = grep { !exists $fieldh->{$_} } @{$list};
+    error( 'fields', "unknown $error_label fields: " . join( ', ', @not_field ) )
+      if @not_field;
+
+    return $list;
+}
+
 =attr nullify
 
 The value passed to the constructor (if any).
@@ -166,15 +206,42 @@ The value passed to the constructor (if any).
 
 returns true if L</nullify> has been set.
 
+=attr numify
+
+   $bool = $s->numify;
+
+The value passed to the constructor (if any).
+See the discussion for the L<< numify|Data::Record::Serialize/numify >> constructor option.
+
+=method has_numify
+
+returns true if L</numify> has been set.
+
+=attr stringify
+
+   $bool = $s->stringify;
+
+The value passed to the constructor (if any).
+See the discussion for the L<< stringify|Data::Record::Serialize/stringify >> constructor option.
+
+=method has_stringify
+
+returns true if L</stringify> has been set.
+
+
 =cut
 
 
-has nullify => (
+has [ 'nullify', 'numify', 'stringify' ] => (
     is        => 'rw',
     isa       => ( ArrayRef [Str] | CodeRef | Bool ),  # need parens for perl <= 5.12.5
     predicate => 1,
-    trigger   => sub { $_[0]->_clear_nullify },
+    trigger   => 1,
 );
+
+sub _trigger_nullify   { $_[0]->_clear_nullified }
+sub _trigger_numify    { $_[0]->_clear_numified }
+sub _trigger_stringify { $_[0]->_clear_stringified }
 
 =method nullified
 
@@ -193,18 +260,56 @@ C<Data::Record::Serialize::Error::Role::Base::fields>.
 =cut
 
 sub nullified {
-
     my $self = shift;
-
-    return unless $self->has_fields;
-
-    return [ @ { $self->_nullify } ];
+    return [ $self->has_fields ? @{$self->_nullified} : () ];
 }
 
 
-has _nullify => (
-    is        => 'rwp',
-    lazy      => 1,
+=method numified
+
+  $fields = $obj->numified;
+
+Returns a list of fields which are converted to numbers.
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<numified> may result in
+verification of the list of numified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=cut
+
+sub numified {
+    my $self = shift;
+    return [ $self->has_fields ? @{$self->_numified} : () ];
+}
+
+=method stringified
+
+  $fields = $obj->stringified;
+
+Returns a list of fields which are converted to stringbers.
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<stringified> may result in
+verification of the list of stringified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=cut
+
+sub stringified {
+    my $self = shift;
+    return [ $self->has_fields ? @{$self->_stringified} : () ];
+}
+
+
+has [ '_nullified', '_numified', '_stringified' ] => (
+    is        => 'lazy',
     isa       => ArrayRef [Str],
     clearer   => 1,
     predicate => 1,
@@ -212,36 +317,37 @@ has _nullify => (
     builder   => 1,
 );
 
-sub _build__nullify {
+sub _build__nullified {
     my $self = shift;
-
-    if ( $self->has_nullify ) {
-        my $nullify = $self->nullify;
-
-        if ( is_coderef( $nullify ) ) {
-            $nullify = ( ArrayRef [Str] )->assert_return( $nullify->( $self ) );
-        }
-        elsif ( is_arrayref( $nullify ) ) {
-            $nullify = [@$nullify];
-        }
-        else {
-            $nullify = [ $nullify ? @{ $self->fields } : () ];
-        }
-
-        my $fieldh = $self->_fieldh;
-        my @not_field = grep { !exists $fieldh->{$_} } @{$nullify};
-        error( 'fields', "unknown nullify fields: ", join( ', ', @not_field ) )
-          if @not_field;
-
-        return $nullify;
-    }
-
-    # this allows encoder's to use a before or around modifier
-    # applied to _build__nullify to specify a default via
-    # $self->_set__nullify.
-    $self->_has_nullify ? $self->_nullify : [];
+    return $self->has_nullify
+      ? $self->_build_field_list_with_type( $self->nullify, ANY, 'nullify' )
+      : [];
 }
 
+sub _build__numified {
+    my $self = shift;
+    return $self->has_numify
+      ? $self->_build_field_list_with_type( $self->numify, NUMBER, 'numify' )
+      : [];
+}
+
+sub _build__stringified {
+    my $self = shift;
+    return $self->has_stringify
+      ? $self->_build_field_list_with_type( $self->stringify, STRING, 'stringify' )
+      : [];
+}
+
+
+=method B<string_fields>
+
+  $array_ref = $s->string_fields;
+
+The input field names for those fields deemed to be strings
+
+=cut
+
+sub string_fields { $_[0]->type_index->[STRING] }
 
 
 =method B<numeric_fields>
@@ -252,12 +358,8 @@ The input field names for those fields deemed to be numeric (either N or I).
 
 =cut
 
-has numeric_fields => (
-    is        => 'lazy',
-    init_args => undef,
-    clearer   => 1,
-    builder   => sub { $_[0]->type_index->[NUMBER] },
-);
+sub numeric_fields { $_[0]->type_index->[NUMBER] }
+
 
 =method B<boolean_fields>
 
@@ -267,12 +369,8 @@ The input field names for those fields deemed to be boolean.
 
 =cut
 
-has boolean_fields => (
-    is        => 'lazy',
-    init_args => undef,
-    clearer   => 1,
-    builder   => sub { $_[0]->type_index->[ BOOLEAN ] },
-);
+sub boolean_fields { $_[0]->type_index->[ BOOLEAN ] }
+
 
 =method B<type_index>
 
@@ -310,7 +408,7 @@ everything that's not C<STRING>
 has type_index => (
     is       => 'lazy',
     init_arg => undef,
-    clearer  => '_clear_type_index',
+    clearer  => 1,
     builder  => sub {
         my $self = shift;
         error( 'types', "no types for fields are available" )
@@ -319,26 +417,13 @@ has type_index => (
     },
 );
 
-
-=for Pod::Coverage
-clear_type_index
-
-=cut
-
-sub clear_type_index {
-    my $self = shift;
-    $self->_clear_type_index;
-    $self->clear_boolean_fields;
-    $self->clear_numeric_fields;
-}
-
 =method B<output_types>
 
   $hash_ref = $s->output_types;
 
-The mapping between output field name and output field type.  If the
+The fully resolved mapping between output field name and output field type.  If the
 encoder has specified a type map, the output types are the result of
-that mapping.
+that mapping.  This is only valid after the first record has been sent.
 
 =cut
 
@@ -353,7 +438,7 @@ sub _build_output_types {
     my $self = shift;
     my %types;
 
-    error( 'types', "no types for fields are available" )
+    return
       unless $self->has_types;
 
     my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };

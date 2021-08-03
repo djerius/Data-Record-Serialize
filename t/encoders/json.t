@@ -53,6 +53,6 @@ is(
         },
     ],
     'properly formatted'
-);
+) or do { use Data::Dump; note (dd \@VAR1) };
 
 done_testing;

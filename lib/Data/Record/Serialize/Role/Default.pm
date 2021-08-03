@@ -44,7 +44,6 @@ sub send {
 # just in case they're not defined in preceding roles
 sub setup { }
 sub _map_types { }
-sub _numify { 0 }
 sub _needs_eol { 1 }
 
 around 'setup' => sub {
@@ -88,9 +87,19 @@ before 'send' => sub {
 
     # nullify fields (set to undef) those that are zero length
 
-    if ( defined( my $nullify = $self->_nullify ) ) {
+    if ( defined( my $fields = $self->_nullified ) ) {
         $data->{$_} = undef
-          for grep { defined $data->{$_} && !length $data->{$_} } @$nullify;
+          for grep { defined $data->{$_} && !length $data->{$_} } @$fields;
+    }
+
+    if ( defined( my $fields = $self->_numified ) ) {
+        $data->{$_} = ( $data->{$_} || 0 ) + 0
+          for grep { defined $data->{$_} } @{$fields};
+    }
+
+    if ( defined( my $fields = $self->_stringified ) ) {
+        $data->{$_} = "@{[ $data->{$_}]}"
+          for grep { defined $data->{$_} } @{$fields};
     }
 
     if ( my $format = $self->_format ) {
@@ -102,9 +111,6 @@ before 'send' => sub {
           keys %{$format};
     }
 
-    if ( $self->_numify ) {
-        $_ = ( $_ || 0 ) + 0 foreach @{$data}{ @{ $self->numeric_fields } };
-    }
 
     # handle boolean
     if ( $self->_boolify ) {

@@ -10,7 +10,9 @@ use JSON::MaybeXS qw[ encode_json ];
 
 use namespace::clean;
 
-sub _numify { 1 }
+has '+numify' => ( is => 'ro', default => 1 );
+has '+stringify' => ( is => 'ro', default => 1 );
+
 sub _needs_eol { 1 }
 
 sub _to_bool { $_[0] ? \1 : \0 }
@@ -45,6 +47,8 @@ B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
 as a number.
 
+Boolean fields (type C<B>) are transformed into C<\1> or <C\0> 
+
 The output consists of I<concatenated> JSON objects, and is mostly easily
 read by an incremental decoder, e.g.
 
@@ -58,4 +62,4 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.

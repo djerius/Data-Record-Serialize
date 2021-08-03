@@ -62,7 +62,7 @@ values.
 ## Types
 
 Some output encoders care about the type of a
-field. **Data::Record::Serialize** recognizes thesea types:
+field. **Data::Record::Serialize** recognizes these types:
 
 - `N` - Number (any number)
 - `I` - Integer
@@ -75,21 +75,23 @@ field. **Data::Record::Serialize** recognizes thesea types:
     Encoded as `I` if not available.
 
 Not all encoders support separate integer or Boolean types. Where not supported,
-intgers are encoded as numbers and Booleans as integers.
+integers are encoded as numbers and Booleans as integers.
 
 Types may be specified for fields, or may be automatically determined
 from the first record which is output.  It is not possible to
-deterministically determine if a field is Boolean, so that must be
-explicitly noted.  Boolean fields should be "truthy", e.g., when used
-in a conditional, they evaluate to true or false.
+deterministically determine if a field is Boolean, so such fields
+must be explicitly specified.  Boolean fields should be "truthy",
+e.g., when used in a conditional, they evaluate to true or false.
 
 ## Field transformation
 
 Transformations can be applied to fields prior to output, and may be
-specified for data types as well as for individual fields (the latter
-take precedence).  Transformations are specified via the
-["formmat\_fields"](#formmat_fields) and ["format\_types"](#format_types) parameters.  They
-can either be a `sprintf` compatible format string,
+specified globally for data types as well as for specifically for
+fields. The latter take precedence.
+
+Transformations are specified via the ["format\_fields"](#format_fields) and
+["format\_types"](#format_types) parameters.  They can either be a `sprintf`
+compatible format string,
 
        format_types => { N => '%0.4f' },
        format_fields => { obsid => '%05d' },
@@ -102,20 +104,20 @@ can either be a `sprintf` compatible format string,
 
 The available encoders and their respective documentation are:
 
-- `dbi` - [Data::Record::Serialize::Encode::dbi](https://metacpan.org/pod/Data::Record::Serialize::Encode::dbi)
+- `dbi` - [Data::Record::Serialize::Encode::dbi](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Adbi)
 
     Write to a database via **DBI**. This is a combined
     encoder and sink.
 
-- `ddump` - [Data::Record::Serialize::Encode::ddump](https://metacpan.org/pod/Data::Record::Serialize::Encode::ddump)
+- `ddump` - [Data::Record::Serialize::Encode::ddump](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Addump)
 
-    encode via [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
+    encode via [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)
 
-- `json` - [Data::Record::Serialize::Encode::json](https://metacpan.org/pod/Data::Record::Serialize::Encode::json)
+- `json` - [Data::Record::Serialize::Encode::json](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ajson)
 - `null` - send the data to the bit bucket.  This is a combined
 encoder and sink.
-- `rdb`  - [Data::Record::Serialize::Encode::rdb](https://metacpan.org/pod/Data::Record::Serialize::Encode::rdb)
-- `yaml` - [Data::Record::Serialize::Encode::yaml](https://metacpan.org/pod/Data::Record::Serialize::Encode::yaml)
+- `rdb`  - [Data::Record::Serialize::Encode::rdb](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ardb)
+- `yaml` - [Data::Record::Serialize::Encode::yaml](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ayaml)
 
 ## Sinks
 
@@ -123,13 +125,16 @@ Sinks are where encoded data are sent.
 
 The available sinks and their documentation are:
 
-- `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data::Record::Serialize::Sink::stream)
+- `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)
 - `null` - send the encoded data to the bit bucket.
 
 ## Fields and their types
 
 Which fields are output and how their types are determined depends
-upon the `fields`, `types`, and `default_type` attributes.
+upon the ["fields"](#fields), ["types"](#types), and ["default\_type"](#default_type) attributes.
+
+This seems a bit complicated, but the idea is to provide a DWIM
+interface requiring minimal specification.
 
 In the following table:
 
@@ -175,9 +180,9 @@ record sent to the output stream.
 ## Errors
 
 Most errors result in exception objects being thrown, typically in the
-[Data::Record::Serialize::Error](https://metacpan.org/pod/Data::Record::Serialize::Error) hierarchy.
+[Data::Record::Serialize::Error](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AError) hierarchy.
 
-# METHODS
+# CLASS METHODS
 
 ## **new**
 
@@ -188,9 +193,10 @@ Construct a new object. The following arguments are recognized:
 
 - `types` => _hashref_|_arrayref_
 
-    A hash or array mapping input field names to types (`N`, `I`,
-    `S`, `B` ).  If an array, the fields will be output in the specified
-    order, provided the encoder permits it (see below, however).  For example,
+    This specifies types (`N`, `I`, `S`, `B` ) for fields.
+
+    If an array, the fields will be output in the specified order,
+    provided the encoder permits it (see below, however).  For example,
 
         # use order if possible
         types => [ c => 'N', a => 'N', b => 'N' ]
@@ -198,7 +204,7 @@ Construct a new object. The following arguments are recognized:
         # order doesn't matter
         types => { c => 'N', a => 'N', b => 'N' }
 
-    If `fields` is specified, then its order will override that specified
+    If ["fields"](#fields) is specified, then its order will override that specified
     here.
 
     To understand how this attribute works in concert with ["fields"](#fields) and
@@ -207,7 +213,7 @@ Construct a new object. The following arguments are recognized:
 - `default_type` => `S`|`N`|`I`|`B`
 
     The default input type for fields whose types were not specified via
-    the `types`.
+    the ["types"](#types).
 
     To understand how this attribute works in concert with ["fields"](#fields) and
     ["types"](#types), please see ["Fields and their types"](#fields-and-their-types).
@@ -220,22 +226,33 @@ Construct a new object. The following arguments are recognized:
     permits it.
 
     To understand how this attribute works in concert with ["types"](#types) and
-    ["default\_type"](#default_type), please see ["Fields and their types" in Data::Record::Serialize](https://metacpan.org/pod/Data::Record::Serialize#Fields-and-their-types).
+    ["default\_type"](#default_type), please see ["Fields and their types"](#fields-and-their-types).
 
 - `encode` => _encoder_
 
-    _Required_. The encoding format.  Specific encoders may provide
-    additional, or require specific, attributes. See ["Encoders"](#encoders)
-    for more information.
+    _Required_. The module which will encode the data.
+
+    With no prefix, it is assumed to be in the
+    `Data::Record::Serialize::Encode` namespace.  With a prefix of `+`
+    it is a fully qualified module name.
+
+    Specific encoders may provide additional, or require specific,
+    attributes. See ["Encoders"](#encoders) for more information.
 
 - `sink` => _sink_
 
-    Where the encoded data will be sent.  Specific sinks may provide
-    additional, or require specific attributes. See ["Sinks"](#sinks) for more
-    information.
+    The module which writes the encoded data.
 
-    The default output sink is `stream`, unless the encoder is also a
-    sink.
+    With no prefix, it is assumed to be in the
+    `Data::Record::Serialize::Sink` namespace.  With a prefix of `+`
+    it is a fully qualified module name.
+
+    Specific sinks may provide additional, or require specific
+    attributes. See ["Sinks"](#sinks) for more information.
+
+    The value is `stream` (corresponding to
+    [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)), unless the encoder is also
+    a sink.
 
     It is an error to specify a sink if the encoder already acts as one.
 
@@ -262,36 +279,101 @@ Construct a new object. The following arguments are recognized:
     sent. A `Data::Record::Serialize::Error::Role::Base::fields` error is thrown
     if non-existent fields are specified.
 
-- `format_fields`
+- `numify` => _arrayref_|_coderef_|Boolean
 
-    A hash mapping the input field names to either a `sprintf` style
-    format or a coderef. This will be applied prior to encoding the
-    record, but only if the `format` attribute is also set.  Formats
-    specified here override those specified in `format_types`.
+    Specify fields that should be explicitly transformed into a number. It
+    defaults to `false`, unless a particular encoder requires it
+    (e.g. `json`).  To avoid unnecessary conversion overhead, set this to
+    `false` if you are sure that your data are appropriately numified, or
+    if only a few fields need to be transformed and can be done via the
+    ["format\_fields"](#format_fields) option.
+
+    **numify** may be passed:
+
+    - an arrayref of input field names
+    - a coderef
+
+        The coderef is called as
+
+            @input_field_names = $code->( $serializer_object )
+
+    - a Boolean
+
+        If true, all numeric fields are added to the list. When false, the list
+        is emptied.
+
+    Names are verified against the input fields after the first record is
+    sent. A `Data::Record::Serialize::Error::Role::Base::fields` error is thrown
+    if non-existent fields are specified.
+
+- `stringify` => _arrayref_|_coderef_|Boolean
+
+    Specify fields that should be explicitly transformed into a string. It
+    defaults to `false`, unless a particular encoder requires it
+    (e.g. `json`).  To avoid unnecessary conversion overhead, set this to
+    `false` if you are sure that your data are appropriately stringified, or
+    if only a few fields need to be transformed and can be done via the
+    ["format\_fields"](#format_fields) option.
+
+    **stringify** may be passed:
+
+    - an arrayref of input field names
+    - a coderef
+
+        The coderef is called as
+
+            @input_field_names = $code->( $serializer_object )
+
+    - a Boolean
+
+        If true, all string fields are added to the list. When false, the list
+        is emptied.
+
+    Names are verified against the input fields after the first record is
+    sent. A `Data::Record::Serialize::Error::Role::Base::fields` error is thrown
+    if non-existent fields are specified.
+
+- `format_fields` => _hashref_
+
+    Specify transforms specific to fields.  The hash keys are input field names,
+    each value is either a `sprintf` style format or a coderef. The
+    transformations will be applied prior to encoding the record, but only
+    if the ["format"](#format) attribute is also set.  Formats specified here
+    override those specified in ["format\_types"](#format_types).
 
     The coderef will be called with the value to format as its first
     argument, and should return the formatted value.
 
-- `format_types`
+- `format_types` => _hashref_
 
-    A hash mapping a field type (`N`, `I`, `S`) to a `sprintf` style
-    format or a coderef.  This will be applied prior to encoding the
-    record, but only if the `format` attribute is also set.  Formats
-    specified here may be overridden for specific fields using the
-    `format_fields` attribute.
+    Specify transforms specific to types. The hash keys are field types
+    (`N`, `I`, `S`), each value is either a `sprintf` style format or a coderef.
+     The transformations will be applied prior to encoding the record, but
+    only if the ["format"](#format) attribute is also set.  Formats specified here
+    may be overridden for specific fields using the ["format\_fields"](#format_fields)
+    attribute.
 
     The coderef will be called with the value to format as its first
     argument, and should return the formatted value.
 
-- `rename_fields`
+- `rename_fields` => _hashref_
 
     A hash mapping input to output field names.  By default the input
     field names are used unaltered.
 
-- `format`
+- `format` => _Boolean_
 
     If true, format the output fields using the formats specified in the
-    `format_fields` and/or `format_types` options.  The default is false.
+    ["format\_fields"](#format_fields) and/or ["format\_types"](#format_types) options.  The default is false.
+
+# METHODS
+
+For additional methods, see the following modules
+
+- ["Data::Serialize::Record::Role::Base"](#data-serialize-record-role-base)
+- ["Data::Serialize::Record::Role::Default"](#data-serialize-record-role-default)
+- ["Data::Serialize::Record::Encode"](#data-serialize-record-encode)
+- ["Data::Serialize::Record::Sink"](#data-serialize-record-sink),
 
 ## **send**
 
@@ -301,6 +383,15 @@ Encode and send the record to the associated sink.
 
 **WARNING**: the passed hash is modified.  If you need the original
 contents, pass in a copy.
+
+# ATTRIBUTES
+
+Object attributes are provided by the following modules
+
+- ["Data::Serialize::Record::Role::Base"](#data-serialize-record-role-base)
+- ["Data::Serialize::Record::Role::Default"](#data-serialize-record-role-default)
+- ["Data::Serialize::Record::Encode"](#data-serialize-record-encode)
+- ["Data::Serialize::Record::Sink"](#data-serialize-record-sink),
 
 # EXAMPLES
 
@@ -367,15 +458,6 @@ contents, pass in a copy.
       types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
      );
 
-# ATTRIBUTES
-
-Object attributes are gathered from
-["Data::Serialize::Record::Role::Base"](#data-serialize-record-role-base),
-["Data::Serialize::Record::Role::Default"](#data-serialize-record-role-default),
-and the ["Data::Serialize::Record::Encode"](#data-serialize-record-encode), and 
-["Data::Serialize::Record::Sink"](#data-serialize-record-sink),
-modules.
-
 # SUPPORT
 
 ## Bugs
@@ -396,7 +478,7 @@ and may be cloned from
 
 Please see those modules/websites for more information related to this module.
 
-- [Data::Serializer](https://metacpan.org/pod/Data::Serializer)
+- [Data::Serializer](https://metacpan.org/pod/Data%3A%3ASerializer)
 
 # AUTHOR
 

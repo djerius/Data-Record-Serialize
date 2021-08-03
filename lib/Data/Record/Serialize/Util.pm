@@ -10,6 +10,7 @@ my @TYPE_CATEGORY_NAMES;
 my %TYPES;
 BEGIN {
     @TYPE_CATEGORY_NAMES = qw(
+      ANY
       INTEGER
       FLOAT
       NUMBER
@@ -44,6 +45,7 @@ our @EXPORT_OK = map { @{$_} } values %EXPORT_TAGS;
 my @TypeRE;
 $TypeRE[ $_->[0] ] = $_->[1]
   for
+  [ ANY             ,=> qr/.*/     ],
   [ STRING          ,=> qr/^S/i    ],
   [ FLOAT           ,=> qr/^N/i    ],
   [ INTEGER         ,=> qr/^I/i    ],

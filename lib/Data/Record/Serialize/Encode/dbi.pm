@@ -231,9 +231,17 @@ has queue => (
     default  => sub { [] },
 );
 
-before '_build__nullify' => sub {
-    my $self = shift;
-    $self->_set__nullify( $self->numeric_fields );
+around '_build__nullified' => sub {
+    my $orig = shift;
+    my $self = $_[0];
+
+    my $nullified = $self->$orig( @_ );
+
+    # defer to the caller
+    return $nullified if $self->has_nullify;
+
+    # add all of the numeric fields
+    [ @{ $self->numeric_fields } ];
 
 };
 
@@ -558,12 +566,7 @@ sub DEMOLISH {
 
 =cut
 
-sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
-sub print  { error( 'Encode::stub_method', 'internal error: stub method <print> invoked' ) }
-sub encode { error( 'Encode::stub_method', 'internal error: stub method <encode> invoked' ) }
-
-with 'Data::Record::Serialize::Role::Sink';
-with 'Data::Record::Serialize::Role::Encode';
+with 'Data::Record::Serialize::Role::EncodeAndSink';
 
 1;
 
@@ -598,6 +601,10 @@ Field types are recognized and converted to SQL types via the following map:
   N => 'real'
   I => 'integer'
 
+For Postgres, C<< B => 'boolean' >>. For other databases, C<< B => 'integer' >>.
+This encoder handles transformation of the input "truthy" Boolean value into
+a form appropriate for the database to ingest.
+
 =head2 NULL values
 
 By default numeric fields are set to C<NULL> if they are empty.  This
@@ -620,4 +627,4 @@ objects.
 =head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
-defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+defined for L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
