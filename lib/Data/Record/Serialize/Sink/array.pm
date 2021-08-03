@@ -75,3 +75,4 @@ It performs the L<Data::Record::Serialize::Role::Sink> role.
 
 Optional. Where to write the data. An arrayref is provided if not specified.
 
+=back
