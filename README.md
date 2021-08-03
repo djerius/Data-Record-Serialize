@@ -99,22 +99,22 @@ compatible format string,
 
 The available encoders and their respective documentation are:
 
-- `dbi` - [Data::Record::Serialize::Encode::dbi](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Adbi)
+- `dbi` - [Data::Record::Serialize::Encode::dbi](https://metacpan.org/pod/Data::Record::Serialize::Encode::dbi)
 
     Write to a database via **DBI**. This is a combined
     encoder and sink.
 
-- `ddump` - [Data::Record::Serialize::Encode::ddump](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Addump)
+- `ddump` - [Data::Record::Serialize::Encode::ddump](https://metacpan.org/pod/Data::Record::Serialize::Encode::ddump)
 
-    encode via [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)
+    encode via [Data::Dumper](https://metacpan.org/pod/Data::Dumper)
 
-- `json` - [Data::Record::Serialize::Encode::json](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ajson)
-- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Anull)
+- `json` - [Data::Record::Serialize::Encode::json](https://metacpan.org/pod/Data::Record::Serialize::Encode::json)
+- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data::Record::Serialize::Sink::null)
 
     This is a combined encoder and sink.
 
-- `rdb`  - [Data::Record::Serialize::Encode::rdb](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ardb)
-- `yaml` - [Data::Record::Serialize::Encode::yaml](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ayaml)
+- `rdb`  - [Data::Record::Serialize::Encode::rdb](https://metacpan.org/pod/Data::Record::Serialize::Encode::rdb)
+- `yaml` - [Data::Record::Serialize::Encode::yaml](https://metacpan.org/pod/Data::Record::Serialize::Encode::yaml)
 
 ## Sinks
 
@@ -122,15 +122,15 @@ Sinks are where encoded data are sent.
 
 The available sinks and their documentation are:
 
-- `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)
+- `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data::Record::Serialize::Sink::stream)
 
     write to a stream
 
-- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Anull)
+- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data::Record::Serialize::Sink::null)
 
     send the encoded data to the bit bucket.
 
-- `array` - [Data::Record::Serialize::Sink::array](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Aarray)
+- `array` - [Data::Record::Serialize::Sink::array](https://metacpan.org/pod/Data::Record::Serialize::Sink::array)
 
     append the encoded data to an array.
 
@@ -189,7 +189,7 @@ record sent to the output stream.
 ## Errors
 
 Most errors result in exception objects being thrown, typically in the
-[Data::Record::Serialize::Error](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AError) hierarchy.
+[Data::Record::Serialize::Error](https://metacpan.org/pod/Data::Record::Serialize::Error) hierarchy.
 
 # CLASS METHODS
 
@@ -261,7 +261,7 @@ by the specified encoders and sinks, the following arguments are recognized:
     attributes. See ["Sinks"](#sinks) for more information.
 
     The value is `stream` (corresponding to
-    [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)), unless the encoder is also
+    [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data::Record::Serialize::Sink::stream)), unless the encoder is also
     a sink.
 
     It is an error to specify a sink if the encoder already acts as one.
@@ -488,7 +488,7 @@ and may be cloned from
 
 Please see those modules/websites for more information related to this module.
 
-- [Data::Serializer](https://metacpan.org/pod/Data%3A%3ASerializer)
+- [Data::Serializer](https://metacpan.org/pod/Data::Serializer)
 
 # AUTHOR
 
