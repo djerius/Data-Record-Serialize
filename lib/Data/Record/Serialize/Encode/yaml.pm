@@ -17,7 +17,7 @@ sub _needs_eol { 1 }
 
 =cut
 
-sub encode { shift; goto \&Dump; }
+sub encode { shift; Dump(@_) }
 
 with 'Data::Record::Serialize::Role::Encode';
 
