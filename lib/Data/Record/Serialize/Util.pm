@@ -32,9 +32,10 @@ BEGIN {
 use enum @TYPE_CATEGORY_NAMES;
 use constant \%TYPES;
 
-our @TYPE_CATEGORIES = map {
+our @TYPE_CATEGORIES = map {;  # add a ; to help 5.10
     no strict 'refs'; ## no critic(ProhibitNoStrict)
-    $_->() } @TYPE_CATEGORY_NAMES;
+    $_->();
+} @TYPE_CATEGORY_NAMES;
 
 our %EXPORT_TAGS = (
     types     => [ keys %TYPES ],
