@@ -75,7 +75,8 @@ sub make_variant {
   $s = Data::Record::Serialize->new( %args );
   $s = Data::Record::Serialize->new( \%args );
 
-Construct a new object. The following arguments are recognized:
+Construct a new object. In addition to any arguments required or provided
+by the specified encoders and sinks, the following arguments are recognized:
 
 =over
 
@@ -237,10 +238,14 @@ Names are verified against the input fields after the first record is
 sent. A C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
 if non-existent fields are specified.
 
+=item C<format> => I<Boolean>
+
+If true, format the output fields using the formats specified in the
+L</format_fields> and/or L</format_types> options.  The default is true.
 
 =item C<format_fields> => I<hashref>
 
-Specify transforms specific to fields.  The hash keys are input field names,
+Specify transforms specific to fields.  The hash keys are input field names;
 each value is either a C<sprintf> style format or a coderef. The
 transformations will be applied prior to encoding the record, but only
 if the L</format> attribute is also set.  Formats specified here
@@ -253,7 +258,7 @@ argument, and should return the formatted value.
 =item C<format_types> => I<hashref>
 
 Specify transforms specific to types. The hash keys are field types
-(C<N>, C<I>, C<S>), each value is either a C<sprintf> style format or a coderef.
+(C<N>, C<I>, C<S>, C<B>); each value is either a C<sprintf> style format or a coderef.
  The transformations will be applied prior to encoding the record, but
 only if the L</format> attribute is also set.  Formats specified here
 may be overridden for specific fields using the L</format_fields>
@@ -266,11 +271,6 @@ argument, and should return the formatted value.
 
 A hash mapping input to output field names.  By default the input
 field names are used unaltered.
-
-=item C<format> => I<Boolean>
-
-If true, format the output fields using the formats specified in the
-L</format_fields> and/or L</format_types> options.  The default is false.
 
 
 =back
@@ -388,8 +388,6 @@ C<N> - Number (any number)
 
 C<I> - Integer
 
-Encoded as C<N> if not available.
-
 =item *
 
 C<S> - String
@@ -397,8 +395,6 @@ C<S> - String
 =item *
 
 C<B> - Boolean
-
-Encoded as C<I> if not available.
 
 =back
 
@@ -453,8 +449,9 @@ C<json> - L<Data::Record::Serialize::Encode::json>
 
 =item *
 
-C<null> - send the data to the bit bucket.  This is a combined
-encoder and sink.
+C<null> - L<Data::Record::Serialize::Sink::null>
+
+This is a combined encoder and sink.
 
 =item *
 
@@ -478,13 +475,19 @@ The available sinks and their documentation are:
 
 C<stream> - L<Data::Record::Serialize::Sink::stream>
 
-=item *
-
-C<null> - send the encoded data to the bit bucket.
+write to a stream
 
 =item *
 
-C<array> - append the encoded data to an array.
+C<null> - L<Data::Record::Serialize::Sink::null>
+
+send the encoded data to the bit bucket.
+
+=item *
+
+C<array> - L<Data::Record::Serialize::Sink::array>
+
+append the encoded data to an array.
 
 =back
 

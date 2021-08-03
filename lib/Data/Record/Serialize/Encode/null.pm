@@ -51,4 +51,4 @@ L<Data::Record::Serialize::Role::Sink> roles.
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<Data::Record::Serialize::new>|Data::Record::Serialize/new>.
+L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.

@@ -85,6 +85,10 @@ with 'Data::Record::Serialize::Role::Encode';
 
 __END__
 
+=for Pod::Coverage
+numify
+stringify
+
 =head1 SYNOPSIS
 
     use Data::Record::Serialize;

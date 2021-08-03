@@ -1,5 +1,7 @@
 package Data::Record::Serialize::Util;
 
+# ABSTRACT: Useful things
+
 use strict;
 use warnings;
 our $VERSION = '0.24';
@@ -73,3 +75,11 @@ sub index_types {
 }
 
 1;
+
+# COPYRIGHT
+
+__END__
+
+=for Pod::Coverage
+index_types
+is_type

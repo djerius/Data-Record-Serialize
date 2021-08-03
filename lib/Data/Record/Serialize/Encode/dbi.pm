@@ -28,19 +28,7 @@ use namespace::clean;
 
 =attr C<dsn>
 
-I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
-may either be a string or an arrayref containing strings or arrayrefs,
-which should contain key-value pairs.  Elements in the sub-arrays are
-joined with C<=>, elements in the top array are joined with C<:>.  For
-example,
-
-  [ 'SQLite', { dbname => $db } ]
-
-is transformed to
-
-  SQLite:dbname=$db
-
-The standard prefix of C<dbi:> will be added if not present.
+The value passed to the constructor.
 
 =cut
 
@@ -69,8 +57,7 @@ has dsn => (
 
 =attr C<table>
 
-I<Required> The name of the table in the database which will contain the records.
-It will be created if it does not exist.
+The value passed to the constructor.
 
 =cut
 
@@ -82,7 +69,7 @@ has table => (
 
 =attr C<schema>
 
-The schema to which the table belongs.  Optional.
+The value passed to the constructor.
 
 =for  Pod::Coverage has_schema
 
@@ -97,7 +84,7 @@ has schema => (
 
 =attr C<drop_table>
 
-If true, the table is dropped and a new one is created.
+The value passed to the constructor.
 
 =cut
 
@@ -109,7 +96,7 @@ has drop_table => (
 
 =attr C<create_table>
 
-If true, a table will be created if it does not exist.
+The value passed to the constructor.
 
 =cut
 
@@ -121,9 +108,7 @@ has create_table => (
 
 =attr C<primary>
 
-A single output column name or an array of output column names which
-should be the primary key(s).  If not specified, no primary keys are
-defined.
+The value passed to the constructor.
 
 =cut
 
@@ -136,7 +121,7 @@ has primary => (
 
 =attr C<db_user>
 
-The name of the database user
+The value passed to the constructor.
 
 =cut
 
@@ -148,7 +133,7 @@ has db_user => (
 
 =attr C<db_pass>
 
-The database password
+The value passed to the constructor.
 
 =cut
 
@@ -191,10 +176,7 @@ has column_defs => (
 
 =attr C<batch>
 
-The number of rows to write to the database at once.  This defaults to 100.
-
-If greater than 1, C<batch> rows are cached and then sent out in a
-single transaction.  See L</Performance> for more information.
+The value passed to the constructor.
 
 =cut
 
@@ -207,7 +189,7 @@ has batch => (
 
 =attr C<dbitrace>
 
-A trace setting passed to  L<DBI>.
+The value passed to the constructor.
 
 =cut
 
@@ -582,6 +564,9 @@ with 'Data::Record::Serialize::Role::EncodeAndSink';
 
 __END__
 
+=for stopwords
+Postgres
+
 =head1 SYNOPSIS
 
     use Data::Record::Serialize;
@@ -631,6 +616,72 @@ Transaction errors result in an exception in the
 C<Data::Record::Serialize::Error::Encode::dbi::insert> class. See
 L<Data::Record::Serialize::Error> for more information on exception
 objects.
+
+=head1 CONSTRUCTOR OPTIONS
+
+=over
+
+=item C<dsn>
+
+I<Required> The DBI Data Source Name (DSN) passed to B<L<DBI>>.  It
+may either be a string or an arrayref containing strings or arrayrefs,
+which should contain key-value pairs.  Elements in the sub-arrays are
+joined with C<=>, elements in the top array are joined with C<:>.  For
+example,
+
+  [ 'SQLite', { dbname => $db } ]
+
+is transformed to
+
+  SQLite:dbname=$db
+
+The standard prefix of C<dbi:> will be added if not present.
+
+=item C<table>
+
+I<Required> The name of the table in the database which will contain the records.
+It will be created if it does not exist.
+
+=item C<schema>
+
+The schema to which the table belongs.  Optional.
+
+=item C<drop_table>
+
+If true, the table is dropped and a new one is created.
+
+=item C<create_table>
+
+If true, a table will be created if it does not exist.
+
+=item C<primary>
+
+A single output column name or an array of output column names which
+should be the primary key(s).  If not specified, no primary keys are
+defined.
+
+=item C<db_user>
+
+The name of the database user
+
+=item C<db_pass>
+
+The database password
+
+=item C<batch>
+
+The number of rows to write to the database at once.  This defaults to 100.
+
+If greater than 1, C<batch> rows are cached and then sent out in a
+single transaction.  See L</Performance> for more information.
+
+=item C<dbitrace>
+
+A trace setting passed to  L<DBI>.
+
+
+=back
+
 
 =head1 ATTRIBUTES
 

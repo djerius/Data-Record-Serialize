@@ -290,7 +290,7 @@ sub numified {
 
   $fields = $obj->stringified;
 
-Returns a list of fields which are converted to stringbers.
+Returns a list of fields which are converted to strings.
 
 This will return C<undef> if the list is not yet available (for example, if
 fields names are determined from the first output record and none has been sent).
@@ -444,12 +444,12 @@ sub _build_output_types {
     my @int_fields = grep { defined $self->types->{$_} } @{ $self->fields };
     @types{@int_fields} = @{ $self->types }{@int_fields};
 
-    unless ( $self->encoder_has_type(BOOLEAN) ) {
+    unless ( $self->_encoder_has_type(BOOLEAN) ) {
         $types{$_} = T_INTEGER for @{ $self->boolean_fields };
         $self->_set__convert_boolean_to_int(1);
     }
 
-    unless ( $self->encoder_has_type(INTEGER) ) {
+    unless ( $self->_encoder_has_type(INTEGER) ) {
         $types{$_} = T_NUMBER for @{ $self->numeric_fields };
     }
 
@@ -475,7 +475,7 @@ sub _build_output_types {
 sub _trigger_output_types { }
 
 
-sub encoder_has_type {
+sub _encoder_has_type {
     my ( $self, $type ) = @_;
     any { is_type($_, $type ) } keys %{ $self->_map_types // {} };
 }
@@ -678,6 +678,8 @@ sub _set_types_from_default {
 1;
 
 # COPYRIGHT
+
+__END__
 
 =head1 DESCRIPTION
 

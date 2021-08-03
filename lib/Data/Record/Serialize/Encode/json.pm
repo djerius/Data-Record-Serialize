@@ -40,6 +40,10 @@ with 'Data::Record::Serialize::Role::Encode';
 
 __END__
 
+=for Pod::Coverage
+numify
+stringify
+
 =head1 SYNOPSIS
 
     use Data::Record::Serialize;
@@ -53,9 +57,10 @@ __END__
 B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
 
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
-as a number.
+as a number.  Field's with type C<S> are force to be strings.
 
-Boolean fields (type C<B>) are transformed into C<\1> or <C\0> 
+Boolean fields (type C<B>) are transformed into values recognized by
+the back-end encoder.
 
 The output consists of I<concatenated> JSON objects, and is mostly easily
 read by an incremental decoder, e.g.

@@ -66,13 +66,8 @@ field. **Data::Record::Serialize** recognizes these types:
 
 - `N` - Number (any number)
 - `I` - Integer
-
-    Encoded as `N` if not available.
-
 - `S` - String
 - `B` - Boolean
-
-    Encoded as `I` if not available.
 
 Not all encoders support separate integer or Boolean types. Where not supported,
 integers are encoded as numbers and Booleans as integers.
@@ -114,8 +109,10 @@ The available encoders and their respective documentation are:
     encode via [Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper)
 
 - `json` - [Data::Record::Serialize::Encode::json](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ajson)
-- `null` - send the data to the bit bucket.  This is a combined
-encoder and sink.
+- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Anull)
+
+    This is a combined encoder and sink.
+
 - `rdb`  - [Data::Record::Serialize::Encode::rdb](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ardb)
 - `yaml` - [Data::Record::Serialize::Encode::yaml](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3AEncode%3A%3Ayaml)
 
@@ -126,8 +123,16 @@ Sinks are where encoded data are sent.
 The available sinks and their documentation are:
 
 - `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)
-- `null` - send the encoded data to the bit bucket.
-- `array` - append the encoded data to an array.
+
+    write to a stream
+
+- `null` - [Data::Record::Serialize::Sink::null](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Anull)
+
+    send the encoded data to the bit bucket.
+
+- `array` - [Data::Record::Serialize::Sink::array](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Aarray)
+
+    append the encoded data to an array.
 
 Refer to the documentation for additional constructor options, and
 object and class methods and attributes;
@@ -193,7 +198,8 @@ Most errors result in exception objects being thrown, typically in the
     $s = Data::Record::Serialize->new( %args );
     $s = Data::Record::Serialize->new( \%args );
 
-Construct a new object. The following arguments are recognized:
+Construct a new object. In addition to any arguments required or provided
+by the specified encoders and sinks, the following arguments are recognized:
 
 - `types` => _hashref_|_arrayref_
 
@@ -337,9 +343,14 @@ Construct a new object. The following arguments are recognized:
     sent. A `Data::Record::Serialize::Error::Role::Base::fields` error is thrown
     if non-existent fields are specified.
 
+- `format` => _Boolean_
+
+    If true, format the output fields using the formats specified in the
+    ["format\_fields"](#format_fields) and/or ["format\_types"](#format_types) options.  The default is true.
+
 - `format_fields` => _hashref_
 
-    Specify transforms specific to fields.  The hash keys are input field names,
+    Specify transforms specific to fields.  The hash keys are input field names;
     each value is either a `sprintf` style format or a coderef. The
     transformations will be applied prior to encoding the record, but only
     if the ["format"](#format) attribute is also set.  Formats specified here
@@ -351,7 +362,7 @@ Construct a new object. The following arguments are recognized:
 - `format_types` => _hashref_
 
     Specify transforms specific to types. The hash keys are field types
-    (`N`, `I`, `S`), each value is either a `sprintf` style format or a coderef.
+    (`N`, `I`, `S`, `B`); each value is either a `sprintf` style format or a coderef.
      The transformations will be applied prior to encoding the record, but
     only if the ["format"](#format) attribute is also set.  Formats specified here
     may be overridden for specific fields using the ["format\_fields"](#format_fields)
@@ -364,11 +375,6 @@ Construct a new object. The following arguments are recognized:
 
     A hash mapping input to output field names.  By default the input
     field names are used unaltered.
-
-- `format` => _Boolean_
-
-    If true, format the output fields using the formats specified in the
-    ["format\_fields"](#format_fields) and/or ["format\_types"](#format_types) options.  The default is false.
 
 # METHODS
 
