@@ -114,15 +114,16 @@ before 'send' => sub {
 
     # handle boolean
     if ( $self->_boolify ) {
+        my @fields = grep { exists $data->{$_} } @{ $self->boolean_fields };
 
         if ( $self->_can_bool ) {
-            $_ = $self->to_bool( $_ ) foreach @{$data}{ @{ $self->boolean_fields } };
+            $data->{$_} = $self->to_bool( $data->{$_} ) for @fields;
         }
 
         # the encoder doesn't have native boolean, must convert a
         # truthy value to 0/1;
         else {
-            $_ = $_ ? 1 : 0 foreach @{$data}{ @{ $self->boolean_fields } };
+            $data->{$_} = $data->{$_} ? 1 : 0 foreach @fields;
         }
     }
 
