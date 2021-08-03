@@ -127,6 +127,10 @@ The available sinks and their documentation are:
 
 - `stream` - [Data::Record::Serialize::Sink::stream](https://metacpan.org/pod/Data%3A%3ARecord%3A%3ASerialize%3A%3ASink%3A%3Astream)
 - `null` - send the encoded data to the bit bucket.
+- `array` - append the encoded data to an array.
+
+Refer to the documentation for additional constructor options, and
+object and class methods and attributes;
 
 ## Fields and their types
 
