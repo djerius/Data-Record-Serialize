@@ -83,7 +83,7 @@ subtest 'record requires transformation' => sub {
 
     my $got;
 
-    ok( lives { $got = JSON->new->incr_parse( $output[-1] ) },
+    ok( lives { $got = $json->incr_parse( $output[-1] ) },
         'deserialize record' )
       or diag $@;
 
