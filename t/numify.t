@@ -6,17 +6,7 @@ use Test::Lib;
 
 use Data::Record::Serialize;
 
-my $have_Convert_Scalar = eval { require Convert::Scalar; };
-
-sub is_string {
-    Convert::Scalar::pok( $_[0] );
-}
-
-sub is_number {
-    Convert::Scalar::niok( $_[0] );
-}
-
-sub xsubtest {}
+use My::Test::Util -all;
 
 subtest "default behavior" => sub {
 
