@@ -7,7 +7,7 @@ use Moo::Role;
 use Data::Record::Serialize::Error { errors => [ 'yaml_backend' ] }, -all;
 use Types::Standard qw[ Enum ];
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use JSON::PP;
 
