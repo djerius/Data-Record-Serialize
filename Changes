@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+0.27      2021-08-07 14:10:27-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+   * require at least Cpanel::JSON::XS 3.0236
+
 0.26      2021-08-07 14:10:27-04:00 America/New_York (TRIAL RELEASE)
 
   [BUILD FIX]
