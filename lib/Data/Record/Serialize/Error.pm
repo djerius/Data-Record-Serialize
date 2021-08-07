@@ -5,7 +5,7 @@ package Data::Record::Serialize::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Exporter::Shiny qw( error );
 

@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create' ] }, -all;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use IO::File;
 

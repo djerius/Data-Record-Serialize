@@ -4,7 +4,7 @@ package Data::Record::Serialize::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use parent 'Exporter::Tiny';
 
