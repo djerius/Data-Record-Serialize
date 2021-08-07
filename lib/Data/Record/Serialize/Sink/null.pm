@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =for Pod::Coverage
  print
