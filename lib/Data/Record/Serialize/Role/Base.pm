@@ -179,6 +179,7 @@ ANY ) if the specification is boolean, return a list.
 sub _build_field_list_with_type {
     my ( $self, $list_spec, $type, $error_label ) = @_;
 
+    my $fieldh    = $self->_fieldh;
     my $list = do {
         if ( is_coderef( $list_spec ) ) {
             ( ArrayRef [Str] )->assert_return( $list_spec->( $self ) );
@@ -187,10 +188,13 @@ sub _build_field_list_with_type {
             [@$list_spec];
         }
         else {
-            [ $list_spec ? @{ $self->type_index->[ $type ] } : () ];
+            # want all of the fields. actually just want the ones that will be output,
+            # otherwise the check below will fail.
+            [ grep { exists $fieldh->{$_} } $list_spec ? @{ $self->type_index->[ $type ] } : () ];
         }
     };
-    my $fieldh    = $self->_fieldh;
+
+    # this check is to help catch typos by users
     my @not_field = grep { !exists $fieldh->{$_} } @{$list};
     error( 'fields', "unknown $error_label fields: " . join( ', ', @not_field ) )
       if @not_field;
