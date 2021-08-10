@@ -9,7 +9,7 @@ use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
 
 use Moo::Role;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 
 BEGIN {
