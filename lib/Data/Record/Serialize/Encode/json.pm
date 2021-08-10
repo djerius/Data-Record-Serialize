@@ -2,13 +2,15 @@ package Data::Record::Serialize::Encode::json;
 
 # ABSTRACT: encoded a record as JSON
 
+use strict;
+use warnings;
+
 use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
 
 use Moo::Role;
 
 our $VERSION = '0.28';
 
-use namespace::clean;
 
 BEGIN {
     my $Cpanel_JSON_XS_VERSION = 3.0236;
@@ -24,6 +26,7 @@ BEGIN {
     }
 };
 
+use namespace::clean;
 
 has '+numify' => ( is => 'ro', default => 1 );
 has '+stringify' => ( is => 'ro', default => 1 );
@@ -58,6 +61,7 @@ __END__
 =for Pod::Coverage
 numify
 stringify
+encode_json
 
 =head1 SYNOPSIS
 
