@@ -11,7 +11,7 @@ use JSON::PP; # needed for JSON::PP::true/false
 
 use namespace::clean;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 BEGIN {
     my $YAML_XS_VERSION = 0.67;

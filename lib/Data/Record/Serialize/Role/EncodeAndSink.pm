@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::EncodeAndSink;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Data::Record::Serialize::Error { errors => [ qw( internal  ) ] }, -all;
 
