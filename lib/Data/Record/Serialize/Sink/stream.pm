@@ -26,6 +26,8 @@ has fh => (
           : ( IO::File->new( $self->output, 'w' )
               or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
+   predicate => 1,
+   clearer => 1,
 );
 
 =for Pod::Coverage
@@ -37,7 +39,12 @@ has fh => (
 
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
-sub close { shift->fh->close }
+
+sub close {
+    my $self = shift;
+    $self->fh->close if $self->has_fh;
+    $self->clear_fh;
+}
 
 with 'Data::Record::Serialize::Role::Sink';
 
