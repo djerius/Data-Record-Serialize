@@ -157,8 +157,10 @@ has _sth => (
 );
 
 has _dbh => (
-    is       => 'rwp',
-    init_arg => undef,
+    is        => 'rwp',
+    init_arg  => undef,
+    clearer   => 1,
+    predicate => 1
 );
 
 has column_defs => (
@@ -543,7 +545,9 @@ sub close {
       if $self->batch;
 
     $self->_dbh->disconnect
-      if defined $self->_dbh;
+      if $self->_has_dbh;
+
+    $self->_clear_dbh;
 
     1;
 }
@@ -566,7 +570,9 @@ sub DEMOLISH {
         if @{ $self->queue };
 
     $self->_dbh->disconnect
-      if defined $self->_dbh;
+      if  $self->_has_dbh;
+
+    $self->_clear_dbh;
 }
 
 

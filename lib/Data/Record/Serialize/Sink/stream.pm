@@ -34,6 +34,7 @@ has fh => (
  print
  say
  close
+ has_fh
 
 =cut
 
