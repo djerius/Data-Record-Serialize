@@ -139,7 +139,11 @@ before 'send' => sub {
 };
 
 sub DEMOLISH {
-    $_[0]->close;
+    my ( $self, $in_global_destruction ) = @_;
+
+    # we can't make the decision about whether to pay attention during
+    # Global Destruction. the objects have to do that
+    $self->close( $in_global_destruction );
     return;
 }
 

@@ -26,8 +26,8 @@ has fh => (
           : ( IO::File->new( $self->output, 'w' )
               or error( '::create', "unable to create @{[ $self->output ]}" ) );
     },
-   predicate => 1,
    clearer => 1,
+   predicate => 1,
 );
 
 =for Pod::Coverage
@@ -35,14 +35,20 @@ has fh => (
  say
  close
  has_fh
-
+ clear_fh
 =cut
 
 sub print { shift->fh->print( @_ ) }
 sub say   { shift->fh->say( @_ ) }
 
 sub close {
-    my $self = shift;
+    my ( $self, $in_global_destruction ) = @_;
+
+    # don't bother closing the FH; it'll be done on its own.
+    return if $in_global_destruction;
+
+    # fh is lazy, so the object may close without every using it, so
+    # don't inadvertently create it.
     $self->fh->close if $self->has_fh;
     $self->clear_fh;
 }

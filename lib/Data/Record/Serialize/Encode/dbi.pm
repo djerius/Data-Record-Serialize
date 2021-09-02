@@ -79,7 +79,8 @@ has table => (
 
 The value passed to the constructor.
 
-=for  Pod::Coverage has_schema
+=for  Pod::Coverage
+has_schema
 
 =cut
 
@@ -160,8 +161,14 @@ has _dbh => (
     is        => 'rwp',
     init_arg  => undef,
     clearer   => 1,
-    predicate => 1
+    predicate => 1,
 );
+
+=for Pod::Coverage
+  _has_dbh
+  _clear_dbh
+
+=cut
 
 has column_defs => (
     is       => 'rwp',
@@ -304,7 +311,8 @@ has _producer => (
     },
 );
 
-=for Pod::Coverage setup
+=for Pod::Coverage
+setup
 
 =cut
 
@@ -312,7 +320,7 @@ has _producer => (
 sub setup {
     my $self = shift;
 
-    return if $self->_dbh;
+    return if $self->_has_dbh;
 
     my %attr = (
         AutoCommit               => !$self->batch,
@@ -450,6 +458,8 @@ As an example of completely flushing the queue while notifying of errors:
 sub flush {
     my $self = shift;
 
+    return 1 unless $self->_has_dbh;
+
     my $queue = $self->queue;
 
     if ( @{ $queue } ) {
@@ -541,12 +551,10 @@ As an example of draining the queue while notifying of errors:
 sub close {
     my $self = shift;
 
-    $self->flush
-      if $self->batch;
+    return 1 unless $self->_has_dbh;
 
-    $self->_dbh->disconnect
-      if $self->_has_dbh;
-
+    $self->flush if $self->batch;
+    $self->_dbh->disconnect;
     $self->_clear_dbh;
 
     1;
@@ -572,7 +580,6 @@ sub DEMOLISH {
     $self->_dbh->disconnect
       if  $self->_has_dbh;
 
-    $self->_clear_dbh;
 }
 
 
