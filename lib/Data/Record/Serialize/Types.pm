@@ -5,7 +5,7 @@ package Data::Record::Serialize::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Type::Utils -all;
 use Types::Standard qw( ArrayRef Str Enum );
