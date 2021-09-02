@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+0.30      2021-09-01 18:09:05-04:00 America/New_York
+
+  [BUG FIX]
+
+    * previous fix in 0.29 was incomplete
+
+
 0.29      2021-09-01 18:09:05-04:00 America/New_York
 
   [BUG FIX]
