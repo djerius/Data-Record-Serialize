@@ -17,7 +17,6 @@ my $DBD_SQLite_VERSION = 1.31;
 eval { require  DBD::SQLite; DBD::SQLite->VERSION( $DBD_SQLite_VERSION ); 1; }
   && push @DBDs, [ 'SQLite', '', '', '' ];
 
-
 if ( $ENV{DBI_DRIVER} ) {
     diag( "unable to load DBD::$ENV{DBI_DRIVER}" )
       unless eval "use DBD::$ENV{DBI_DRIVER}; 1";
@@ -37,13 +36,10 @@ if ( $ENV{DBI_DRIVER} ) {
   "Need at least DBD::SQLite (>= $DBD_SQLite_VERSION) to run the DBI backend tests\n";
 
 sub tmpfile {
-
     require File::Temp;
-
     # *BSD systems need EXLOCK=>0 to prevent lock contention (see docs
     # for File::Temp)
     return File::Temp->new( @_, EXLOCK => 0 );
-
 }
 
 
@@ -72,11 +68,8 @@ my $after_cb = sub { };
 
 after_subtest( sub { $after_cb->() } );
 
-
 for my $dbinfo ( @DBDs ) {
-
     my $tmpfile;
-
     my ( $dbd, $db, $user, $pass ) = @$dbinfo;
 
     my $dbf;
@@ -84,19 +77,14 @@ for my $dbinfo ( @DBDs ) {
         $dbf = sub { $tmpfile = tmpfile(); $tmpfile->filename; };
     }
     else {
-
         $dbf = sub { $db };
-
         $after_cb = sub { clear_db( $dbd, $db, $user, $pass ) };
-
         $after_cb->();
     }
-
 
     subtest $dbd => sub {
 
         subtest 'autocommit' => sub {
-
             my $db = $dbf->();
             my $s;
 
@@ -118,11 +106,9 @@ for my $dbinfo ( @DBDs ) {
             $s->close;
 
             test_db( $dbd, $db, $user, $pass );
-
         };
 
         subtest 'transaction rows == batch' => sub {
-
             my $db = $dbf->();
             my $s;
 
@@ -152,7 +138,6 @@ for my $dbinfo ( @DBDs ) {
         };
 
         subtest 'transaction rows < batch' => sub {
-
             my $db = $dbf->();
             my $s;
 
@@ -175,7 +160,6 @@ for my $dbinfo ( @DBDs ) {
         };
 
         subtest 'transaction rows > batch' => sub {
-
             my $db = $dbf->();
             my $s;
 
@@ -199,7 +183,6 @@ for my $dbinfo ( @DBDs ) {
         };
 
         subtest 'drop table' => sub {
-
             my $db = $dbf->();
             my $s;
 
@@ -235,9 +218,7 @@ for my $dbinfo ( @DBDs ) {
             ) or diag $@;
 
             $s->send( {%$_} ) foreach @test_data;
-
             $s->close;
-
             test_db( $dbd, $db, $user, $pass );
         };
 
@@ -245,9 +226,7 @@ for my $dbinfo ( @DBDs ) {
 }
 
 sub test_db {
-
     my $ctx = context;
-
     my ( $dbd, $db, $user, $pass, $nrows ) = @_;
 
     $nrows ||= $test_data_nrows;
@@ -312,7 +291,6 @@ sub test_db {
 }
 
 sub clear_db {
-
     my ( $dbd, $db, $user, $pass ) = @_;
 
     if ( $dbd ne 'SQLite' ) {
