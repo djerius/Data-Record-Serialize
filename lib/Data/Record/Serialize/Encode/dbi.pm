@@ -13,7 +13,7 @@ use Data::Record::Serialize::Error { errors =>
         sqlite_backend
    )] }, -all;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Data::Record::Serialize::Types -types;
 
