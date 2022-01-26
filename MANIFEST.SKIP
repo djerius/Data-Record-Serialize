@@ -17,3 +17,6 @@ CVS/
 ^cover_db/
 ^cpanfile
 \.orig$
+local
+devel
+_build_params
