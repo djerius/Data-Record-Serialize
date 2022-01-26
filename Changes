@@ -1,5 +1,13 @@
 {{$NEXT}}
 
+0.33      2022-01-26 00:22:49-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIX]
+
+   * If an incompatible Cpanel::JSON::XS < 3.0236 was installed, its
+     version of JSON::PP::Boolean was used, rather than the real
+     JSON:PP::Boolean.  (++SREZIC for the report RT#139460)
+
 0.32      2021-09-13 18:14:20-04:00 America/New_York
 
   [BUILD FIX]
