@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use namespace::clean;
 
